@@ -23,9 +23,10 @@
 
 - `assets/logo.svg` - Wot If? wordmark for profile links, docs, and sharing
 - `assets/icon.svg` - app icon and browser favicon
-- `assets/social-card.svg` - Open Graph and X/Twitter preview card
+- `assets/social-card.svg` - editable social preview source
+- `assets/social-card.png` - Open Graph, WhatsApp, and X/Twitter preview card
 
-For production social previews, use a deployed absolute HTTPS URL for `og:image` and `twitter:image`. Some platforms may prefer a PNG or JPG export of the social card.
+For production social previews, use a deployed absolute HTTPS URL for `og:image` and `twitter:image`. WhatsApp is stricter than many crawlers and is more reliable with a PNG or JPG preview image.
 
 ## Roadmap
 [x] Alpha
