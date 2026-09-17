@@ -1,0 +1,3147 @@
+<!DOCTYPE html>
+<!--
+
+  ======================================================================
+
+      _   _      _ _         _   _       _ _        _
+     | \ | |    (_) |       | \ | |     (_) |      (_)
+     |  \| | ___ _| | __ _  |  \| | __ _ _| |_ __ _ _  __ _
+     | . ` |/ _ \ | |/ _` | | . ` |/ _` | | __/ _` | |/ _` |
+     | |\  |  __/ | | (_| | | |\  | (_| | | || (_| | | (_| |
+     |_| \_|\___|_|_|\__,_| |_| \_|\__,_|_|\__\__,_|_|\__,_|
+
+        .-------------------------------.
+       /   GREEN  WHITE  GREEN          \
+      |      |        |        |         |
+      |      |  NGN   |  /^^   |         |
+       \_____|________|________|________/
+
+  Omo dev, you don open source. Welcome.
+  This small calculator na for Nigerians wey wan understand shares,
+  price movement, and "what if I invested?" without too much cho cho cho.
+
+  No be financial advice. Use your head, ask questions, verify numbers.
+  Built with love for Naija. Copyright 2026.
+
+  ======================================================================
+
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Growth Simulator</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17201b;
+      --muted: #647069;
+      --paper: #f6f4ef;
+      --panel: #ffffff;
+      --line: #d9ded6;
+      --accent: #117a5d;
+      --accent-strong: #0b5d46;
+      --accent-soft: #dcefe8;
+      --gain: #0d7c38;
+      --loss: #a2372f;
+      --signal-positive: #0d7c38;
+      --signal-positive-dark: #0b5d46;
+      --signal-negative: #bf352d;
+      --signal-negative-dark: #8e241f;
+      --signal-neutral: #f1c84b;
+      --signal-neutral-dark: #6f5200;
+      --shadow: 0 18px 45px rgba(23, 32, 27, 0.11);
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #edf3ee;
+      --muted: #a7b4ab;
+      --paper: #101713;
+      --panel: #17211c;
+      --line: #314139;
+      --accent: #2fb987;
+      --accent-strong: #1d8f67;
+      --accent-soft: #203a30;
+      --signal-positive-dark: #116948;
+      --signal-negative-dark: #7c211d;
+      --signal-neutral: #d8b23f;
+      --signal-neutral-dark: #f3d66a;
+      --input-bg: #101914;
+      --button-bg: #17231d;
+      --button-bg-hover: #203a30;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(320px, 0.94fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .shell.what-if-mode {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .workspace,
+    .summary {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .workspace {
+      padding: 22px;
+    }
+
+    .summary {
+      position: sticky;
+      top: 24px;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 680px;
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 520px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    .currency-pill {
+      min-width: 74px;
+      height: 38px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      font-weight: 750;
+    }
+
+    .language-control {
+      display: grid;
+      gap: 6px;
+      min-width: 160px;
+    }
+
+    .language-control label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 760;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .language-control select {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 34px 0 10px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 760;
+    }
+
+    html[data-theme="dark"] .language-control select {
+      background: var(--input-bg);
+      color: var(--ink);
+      border-color: #40554a;
+    }
+
+    .theme-toggle {
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: var(--panel);
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 780;
+    }
+
+    .more-button {
+      width: 44px;
+      height: 44px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--ink);
+      font-size: 1.2rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    html[data-theme="dark"] .more-button {
+      background: var(--button-bg);
+      border-color: #40554a;
+      color: var(--ink);
+    }
+
+    .settings-fields {
+      display: grid;
+      gap: 14px;
+    }
+
+    .settings-fields .theme-toggle {
+      width: 100%;
+      height: 44px;
+    }
+
+    .tab-switcher {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-bottom: 16px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef3ef;
+    }
+
+    html[data-theme="dark"] .tab-switcher {
+      background: var(--input-bg);
+      border-color: #40554a;
+    }
+
+    .tab-button {
+      min-height: 46px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 820;
+      line-height: 1.2;
+      transition: background 160ms ease-out, color 160ms ease-out, border-color 160ms ease-out, transform 120ms ease-out;
+    }
+
+    .tab-button[aria-selected="true"] {
+      background: var(--panel);
+      color: var(--accent-strong);
+      border-color: var(--line);
+      box-shadow: 0 1px 2px rgba(23, 32, 27, 0.08);
+    }
+
+    html[data-theme="dark"] .tab-button {
+      background: transparent;
+      color: var(--muted);
+    }
+
+    html[data-theme="dark"] .tab-button[aria-selected="true"] {
+      background: #203128;
+      color: #dff8ed;
+      border-color: #40554a;
+    }
+
+    .tab-button:active {
+      transform: scale(0.98);
+    }
+
+    .tab-panel {
+      display: block;
+    }
+
+    .panel-heading {
+      margin: 0 0 10px;
+      color: var(--ink);
+      font-size: 1.15rem;
+      line-height: 1.2;
+    }
+
+    .controls {
+      display: grid;
+      gap: 16px;
+    }
+
+    .control {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      background: #fbfcfa;
+    }
+
+    html[data-theme="dark"] .control,
+    html[data-theme="dark"] .history,
+    html[data-theme="dark"] .history-item,
+    html[data-theme="dark"] .empty-history {
+      background: #1b2822;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .collapse-toggle {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      font-size: 1rem;
+      font-weight: 820;
+      line-height: 1.25;
+    }
+
+    .collapse-toggle:hover,
+    .collapse-toggle:active,
+    .collapse-toggle:focus {
+      background: transparent;
+      color: var(--accent-strong);
+    }
+
+    .collapse-toggle:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    html[data-theme="dark"] .collapse-toggle,
+    html[data-theme="dark"] .collapse-toggle:active,
+    html[data-theme="dark"] .collapse-toggle:focus {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    html[data-theme="dark"] .collapse-toggle:hover,
+    html[data-theme="dark"] .collapse-toggle:focus-visible {
+      background: transparent;
+      color: #dff8ed;
+    }
+
+    .collapse-icon {
+      width: 28px;
+      height: 28px;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--accent-strong);
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    html[data-theme="dark"] .collapse-icon,
+    html[data-theme="dark"] .stepper,
+    html[data-theme="dark"] input[type="text"],
+    html[data-theme="dark"] .chip,
+    html[data-theme="dark"] .clear-button,
+    html[data-theme="dark"] .history-header,
+    html[data-theme="dark"] .trade-button.sell {
+      background: var(--input-bg);
+      color: var(--ink);
+    }
+
+    html[data-theme="dark"] .control > .collapse-toggle .collapse-icon {
+      background: #203128;
+      border-color: #40554a;
+      color: #dff8ed;
+    }
+
+    .collapsible-content {
+      padding-top: 14px;
+    }
+
+    .control-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .label-group {
+      min-width: 0;
+    }
+
+    label {
+      display: block;
+      color: var(--ink);
+      font-size: 0.98rem;
+      font-weight: 760;
+    }
+
+    .hint {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: 38px minmax(112px, 150px) 38px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      flex: 0 0 auto;
+    }
+
+    html[data-theme="dark"] .stepper {
+      border-color: #40554a;
+    }
+
+    button {
+      border: 0;
+      background: #eef3ef;
+      color: var(--ink);
+      font-size: 1.25rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .icon {
+      width: 1em;
+      height: 1em;
+      flex: 0 0 auto;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .icon-button,
+    .tab-button,
+    .trade-button,
+    .clear-button,
+    .resource-links button,
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .stepper button .icon,
+    .collapse-icon .icon,
+    .modal-close .icon,
+    .more-button .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    html[data-theme="dark"] button {
+      background: var(--button-bg);
+      color: var(--ink);
+    }
+
+    button:hover {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    html[data-theme="dark"] button:hover {
+      background: var(--button-bg-hover);
+      color: #dff8ed;
+    }
+
+    .stepper button {
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+    }
+
+    html[data-theme="dark"] .stepper button {
+      background: var(--button-bg);
+      color: #edf3ee;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      padding: 0 10px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+      font-weight: 760;
+      text-align: center;
+      outline: 0;
+    }
+
+    html[data-theme="dark"] input[type="text"] {
+      border-left-color: #40554a;
+      border-right-color: #40554a;
+    }
+
+    input[type="date"] {
+      font: inherit;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field-input {
+      height: 40px;
+      border: 1px solid var(--line) !important;
+      border-radius: 8px;
+      padding: 0 12px !important;
+      background: #fff;
+      color: var(--ink);
+      text-align: left !important;
+      font-weight: 720;
+    }
+
+    html[data-theme="dark"] .field-input {
+      background: var(--input-bg);
+      color: var(--ink);
+      border-color: #40554a !important;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 28px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .range-row {
+      display: grid;
+      gap: 6px;
+    }
+
+    .range-limits {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .summary-top {
+      padding: 22px;
+      background: var(--accent-strong);
+      color: white;
+    }
+
+    .summary-top.signal-positive {
+      background: var(--signal-positive-dark);
+      color: white;
+    }
+
+    .summary-top.signal-negative {
+      background: var(--signal-negative-dark);
+      color: white;
+    }
+
+    .summary-top.signal-neutral {
+      background: var(--signal-neutral);
+      color: #2b240d;
+    }
+
+    .summary-title {
+      margin: 0 0 8px;
+      font-size: 0.88rem;
+      font-weight: 760;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.82;
+    }
+
+    .future-value {
+      margin: 0;
+      font-size: clamp(2.35rem, 7vw, 4.5rem);
+      line-height: 0.95;
+      font-weight: 850;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .summary-body {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .metric {
+      min-height: 116px;
+      padding: 18px;
+      background: var(--panel);
+    }
+
+    .metric.wide {
+      grid-column: 1 / -1;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 760;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      font-size: 1.45rem;
+      line-height: 1.15;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+
+    .metric-value.gain {
+      color: var(--gain);
+    }
+
+    .metric-value.loss {
+      color: var(--loss);
+    }
+
+    .metric-value.signal-positive,
+    .what-if-value.signal-positive {
+      color: var(--signal-positive);
+    }
+
+    .metric-value.signal-negative,
+    .what-if-value.signal-negative {
+      color: var(--signal-negative);
+    }
+
+    .metric-value.signal-neutral,
+    .what-if-value.signal-neutral {
+      color: var(--signal-neutral-dark);
+    }
+
+    .bar {
+      height: 14px;
+      border-radius: 999px;
+      margin-top: 16px;
+      overflow: hidden;
+      background: #e8ece7;
+    }
+
+    .bar-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+      transition: width 180ms ease;
+    }
+
+    .bar-fill.signal-positive {
+      background: var(--signal-positive);
+    }
+
+    .bar-fill.signal-negative {
+      background: var(--signal-negative);
+    }
+
+    .bar-fill.signal-neutral {
+      background: var(--signal-neutral);
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .chip {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 12px;
+      background: #fff;
+      color: var(--accent-strong);
+      font-size: 0.86rem;
+      font-weight: 780;
+    }
+
+    .trade-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .trade-button {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 820;
+    }
+
+    .trade-button.buy {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .trade-button.sell {
+      background: #fff;
+      color: var(--loss);
+    }
+
+    html[data-theme="dark"] .trade-button.sell {
+      color: #ff9188;
+    }
+
+    .trade-note {
+      min-height: 20px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .trade-price-row {
+      margin-top: 18px;
+    }
+
+    .what-if-result {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+    }
+
+    .what-if-card {
+      min-height: 82px;
+      padding: 12px;
+      background: var(--panel);
+    }
+
+    .what-if-label {
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .what-if-value {
+      margin-top: 7px;
+      color: var(--ink);
+      font-size: 1.18rem;
+      font-weight: 850;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }
+
+    .history {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fbfcfa;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .history-title {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 820;
+    }
+
+    .history-title .collapse-toggle {
+      font-size: 0.92rem;
+    }
+
+    .history-title .collapse-icon {
+      width: 24px;
+      height: 24px;
+      font-size: 0.88rem;
+    }
+
+    .summary-toggle {
+      width: auto;
+      margin-top: 14px;
+      color: #fff;
+      font-size: 0.88rem;
+    }
+
+    .summary-toggle:hover {
+      color: #fff;
+    }
+
+    html[data-theme="dark"] .summary-toggle,
+    html[data-theme="dark"] .summary-toggle:hover {
+      background: transparent;
+      color: #fff;
+    }
+
+    .summary-toggle .collapse-icon {
+      border-color: rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    html[data-theme="dark"] .summary-toggle .collapse-icon {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .summary-top.signal-neutral .summary-toggle {
+      color: #2b240d;
+    }
+
+    html[data-theme="dark"] .summary-top.signal-neutral .summary-toggle,
+    html[data-theme="dark"] .summary-top.signal-neutral .summary-toggle:hover {
+      background: transparent;
+      color: #2b240d;
+    }
+
+    .summary-top.signal-neutral .summary-toggle .collapse-icon {
+      border-color: rgba(43, 36, 13, 0.2);
+      background: rgba(255, 255, 255, 0.42);
+      color: #2b240d;
+    }
+
+    html[data-theme="dark"] .summary-top.signal-neutral .summary-toggle .collapse-icon {
+      background: rgba(255, 255, 255, 0.42);
+      color: #2b240d;
+    }
+
+    .clear-button {
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 12px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 780;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .history-list.collapsible-content,
+    .summary-body.collapsible-content {
+      padding-top: 0;
+    }
+
+    .history-list > div {
+      display: grid;
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .history-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      min-height: 64px;
+      border: 0;
+      padding: 12px 16px;
+      background: #fbfcfa;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .history-item:hover {
+      background: #eef7f2;
+    }
+
+    .history-main,
+    .history-meta {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .history-main {
+      font-size: 0.94rem;
+      font-weight: 820;
+    }
+
+    .history-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 650;
+    }
+
+    .history-gain {
+      font-size: 0.88rem;
+      font-weight: 820;
+      color: var(--gain);
+      white-space: nowrap;
+    }
+
+    .history-gain.loss {
+      color: var(--loss);
+    }
+
+    .history-gain.signal-positive {
+      color: var(--signal-positive);
+    }
+
+    .history-gain.signal-negative {
+      color: var(--signal-negative);
+    }
+
+    .history-gain.signal-neutral {
+      color: var(--signal-neutral-dark);
+    }
+
+    .empty-history {
+      padding: 18px 16px;
+      color: var(--muted);
+      background: #fbfcfa;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .resource-note {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, auto);
+      gap: 14px;
+      align-items: start;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--muted);
+      box-shadow: var(--shadow);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .footer-title {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+      font-size: 0.92rem;
+      font-weight: 850;
+    }
+
+    .resource-note p {
+      margin: 0;
+    }
+
+    .resource-links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .resource-links a,
+    .resource-links button,
+    .modal-link {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 9px;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      font-size: 0.78rem;
+      font-weight: 780;
+      line-height: 1.15;
+      text-align: center;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .resource-links button {
+      width: 100%;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .education-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(10, 14, 12, 0.58);
+    }
+
+    .modal-panel {
+      width: min(440px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 850;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--ink);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 16px;
+    }
+
+    .modal-body p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .modal-link {
+      width: fit-content;
+      margin-top: 14px;
+      padding-inline: 12px;
+    }
+
+    .copyright {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .creator-link {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      color: var(--accent-strong);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .creator-link:hover {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    @media (max-width: 820px) {
+      main {
+        width: min(100% - 12px, 640px);
+        padding: 8px 0;
+      }
+
+      .shell {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .summary {
+        order: -1;
+      }
+
+      .summary {
+        position: static;
+      }
+
+      header {
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: flex-start;
+      }
+
+      .header-actions {
+        width: auto;
+        flex: 0 0 auto;
+      }
+
+      h1 {
+        font-size: 2rem;
+        line-height: 1.04;
+      }
+
+      .subtitle {
+        margin-top: 6px;
+        font-size: 0.9rem;
+        line-height: 1.35;
+      }
+
+      .more-button {
+        width: 42px;
+        height: 42px;
+      }
+
+      .resource-note {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 8px;
+        padding: 12px;
+        font-size: 0.8rem;
+      }
+
+      .footer-title {
+        font-size: 0.86rem;
+      }
+
+      .resource-links {
+        gap: 6px;
+      }
+
+      .resource-links a,
+      .resource-links button,
+      .modal-link {
+        min-height: 30px;
+        padding: 5px 7px;
+        font-size: 0.72rem;
+      }
+
+      .modal-panel {
+        max-height: calc(100vh - 32px);
+        overflow: auto;
+      }
+
+      .copyright {
+        font-size: 0.74rem;
+      }
+
+      .workspace {
+        padding: 8px;
+      }
+
+      .tab-switcher {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        margin-bottom: 8px;
+      }
+
+      .tab-button {
+        min-height: 52px;
+        padding: 0 8px;
+        font-size: 0.92rem;
+      }
+
+      .panel-heading {
+        font-size: 1rem;
+      }
+
+      .controls {
+        gap: 8px;
+      }
+
+      .control {
+        padding: 12px;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .field-input {
+        height: 38px;
+      }
+
+      .collapse-toggle {
+        font-size: 0.94rem;
+      }
+
+      .collapse-icon {
+        width: 26px;
+        height: 26px;
+      }
+
+      .collapsible-content {
+        padding-top: 10px;
+      }
+
+      .control-top {
+        flex-direction: column;
+      }
+
+      .control-top {
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      label {
+        font-size: 0.94rem;
+      }
+
+      .hint {
+        font-size: 0.8rem;
+        line-height: 1.3;
+      }
+
+      .stepper {
+        height: 38px;
+        width: 100%;
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
+      }
+
+      .range-row {
+        gap: 2px;
+      }
+
+      input[type="range"] {
+        height: 22px;
+      }
+
+      .range-limits {
+        font-size: 0.7rem;
+      }
+
+      .quick-actions {
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .chip {
+        height: 31px;
+        padding: 0 10px;
+        font-size: 0.8rem;
+      }
+
+      .trade-price-row {
+        margin-top: 12px;
+      }
+
+      .trade-actions {
+        margin-top: 10px;
+      }
+
+      .trade-button {
+        min-height: 38px;
+      }
+
+      .trade-note {
+        margin-top: 8px;
+        font-size: 0.78rem;
+      }
+
+      .summary-top {
+        padding: 14px;
+      }
+
+      .summary-title {
+        margin-bottom: 6px;
+        font-size: 0.74rem;
+      }
+
+      .future-value {
+        font-size: 2.5rem;
+      }
+
+      .summary-body {
+        grid-template-columns: 1fr;
+      }
+
+      .metric {
+        min-height: 74px;
+        padding: 12px 14px;
+      }
+
+      .metric-label {
+        font-size: 0.68rem;
+      }
+
+      .metric-value {
+        margin-top: 5px;
+        font-size: 1.18rem;
+      }
+
+      .bar {
+        height: 10px;
+        margin-top: 10px;
+      }
+
+      .history {
+        margin-top: 8px;
+      }
+
+      .history-header {
+        padding: 10px 12px;
+      }
+
+      .history-title {
+        font-size: 0.86rem;
+      }
+
+      .clear-button {
+        height: 29px;
+        padding: 0 10px;
+        font-size: 0.72rem;
+      }
+
+      .history-item {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        min-height: 56px;
+        padding: 10px 12px;
+      }
+
+      .history-gain {
+        white-space: normal;
+      }
+
+      .history-main,
+      .history-meta {
+        white-space: normal;
+      }
+
+      .empty-history {
+        padding: 12px;
+        font-size: 0.8rem;
+      }
+
+      .trade-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .what-if-result {
+        grid-template-columns: 1fr;
+        margin-top: 10px;
+      }
+
+      .what-if-card {
+        min-height: 68px;
+        padding: 10px 12px;
+      }
+
+      .what-if-value {
+        font-size: 1.05rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute;overflow:hidden">
+    <symbol id="icon-more" viewBox="0 0 24 24">
+      <circle cx="5" cy="12" r="1.5"></circle>
+      <circle cx="12" cy="12" r="1.5"></circle>
+      <circle cx="19" cy="12" r="1.5"></circle>
+    </symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14"></path>
+      <path d="M5 12h14"></path>
+    </symbol>
+    <symbol id="icon-minus" viewBox="0 0 24 24">
+      <path d="M5 12h14"></path>
+    </symbol>
+    <symbol id="icon-chart" viewBox="0 0 24 24">
+      <path d="M4 19V5"></path>
+      <path d="M4 19h16"></path>
+      <path d="m7 15 4-4 3 3 5-7"></path>
+    </symbol>
+    <symbol id="icon-coins" viewBox="0 0 24 24">
+      <ellipse cx="12" cy="6" rx="7" ry="3"></ellipse>
+      <path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"></path>
+      <path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"></path>
+    </symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24">
+      <path d="M8 3v4"></path>
+      <path d="M16 3v4"></path>
+      <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+      <path d="M4 10h16"></path>
+    </symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24">
+      <path d="M4 7h16"></path>
+      <path d="M10 11v6"></path>
+      <path d="M14 11v6"></path>
+      <path d="M6 7l1 14h10l1-14"></path>
+      <path d="M9 7V4h6v3"></path>
+    </symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24">
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
+      <path d="M4 5.5v16"></path>
+      <path d="M8 7h8"></path>
+      <path d="M8 11h6"></path>
+    </symbol>
+    <symbol id="icon-building" viewBox="0 0 24 24">
+      <path d="M4 21h16"></path>
+      <path d="M6 21V5h12v16"></path>
+      <path d="M9 8h1"></path>
+      <path d="M14 8h1"></path>
+      <path d="M9 12h1"></path>
+      <path d="M14 12h1"></path>
+      <path d="M10 21v-5h4v5"></path>
+    </symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24">
+      <path d="M12 3 5 6v5c0 4.4 2.8 8.4 7 10 4.2-1.6 7-5.6 7-10V6z"></path>
+      <path d="m9 12 2 2 4-5"></path>
+    </symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2"></path>
+      <path d="M12 20v2"></path>
+      <path d="m4.9 4.9 1.4 1.4"></path>
+      <path d="m17.7 17.7 1.4 1.4"></path>
+      <path d="M2 12h2"></path>
+      <path d="M20 12h2"></path>
+      <path d="m4.9 19.1 1.4-1.4"></path>
+      <path d="m17.7 6.3 1.4-1.4"></path>
+    </symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24">
+      <path d="M20 14.5A8 8 0 0 1 9.5 4 7 7 0 1 0 20 14.5z"></path>
+    </symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24">
+      <path d="m6 6 12 12"></path>
+      <path d="M18 6 6 18"></path>
+    </symbol>
+    <symbol id="icon-x-logo" viewBox="0 0 24 24">
+      <path d="M4 4l16 16"></path>
+      <path d="M20 4 4 20"></path>
+    </symbol>
+  </svg>
+  <main>
+    <header>
+      <div>
+        <h1 data-i18n="appTitle">Stock Calculator</h1>
+        <p class="subtitle" data-i18n="subtitle">Simulate market positions.</p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="more-button icon-button" id="settingsOpen" aria-label="More settings" data-i18n-aria-label="moreSettings"><svg class="icon"><use href="#icon-more"></use></svg></button>
+      </div>
+    </header>
+
+    <section class="shell" aria-label="Share growth calculator">
+      <div class="workspace">
+        <div class="tab-switcher" role="tablist" aria-label="Calculator mode" data-i18n-aria-label="calculatorMode">
+          <button type="button" class="tab-button" id="simulatorTab" role="tab" aria-selected="true" aria-controls="simulatorPanel" data-tab-target="simulator">
+            <svg class="icon"><use href="#icon-chart"></use></svg>
+            <span data-i18n="simulatorTab">My shares</span>
+          </button>
+          <button type="button" class="tab-button" id="whatIfTab" role="tab" aria-selected="false" aria-controls="whatIfPanel" data-tab-target="whatIf">
+            <svg class="icon"><use href="#icon-calendar"></use></svg>
+            <span data-i18n="whatIfTab">What if I invested?</span>
+          </button>
+        </div>
+
+        <div class="tab-panel" id="simulatorPanel" role="tabpanel" aria-labelledby="simulatorTab" data-tab-panel="simulator">
+          <div class="controls">
+          <article class="control">
+            <div class="control-top">
+              <div class="label-group">
+                <label for="shares" data-i18n="sharesOwned">Shares owned</label>
+                <div class="hint" data-i18n="sharesHint">Use the slider, type a number, or step with the buttons.</div>
+              </div>
+              <div class="stepper">
+                <button type="button" data-target="shares" data-delta="-10" aria-label="Decrease shares" data-i18n-aria-label="decreaseShares"><svg class="icon"><use href="#icon-minus"></use></svg></button>
+                <input id="shares" type="text" inputmode="decimal" value="100">
+                <button type="button" data-target="shares" data-delta="10" aria-label="Increase shares" data-i18n-aria-label="increaseShares"><svg class="icon"><use href="#icon-plus"></use></svg></button>
+              </div>
+            </div>
+            <div class="range-row">
+              <input id="sharesRange" type="range" min="0" max="100000" step="0.01" value="100" aria-label="Shares owned slider" data-i18n-aria-label="sharesSlider">
+              <div class="range-limits"><span>0</span><span data-i18n="sharesMax">100,000 shares</span></div>
+            </div>
+          </article>
+
+          <article class="control">
+            <div class="control-top">
+              <div class="label-group">
+                <label for="price" data-i18n="currentPrice">Current price per share</label>
+                <div class="hint" data-i18n="currentPriceHint">Defaults to ₦525 per share.</div>
+              </div>
+              <div class="stepper">
+                <button type="button" data-target="price" data-delta="-25" aria-label="Decrease current share price" data-i18n-aria-label="decreasePrice"><svg class="icon"><use href="#icon-minus"></use></svg></button>
+                <input id="price" type="text" inputmode="numeric" value="525">
+                <button type="button" data-target="price" data-delta="25" aria-label="Increase current share price" data-i18n-aria-label="increasePrice"><svg class="icon"><use href="#icon-plus"></use></svg></button>
+              </div>
+            </div>
+            <div class="range-row">
+              <input id="priceRange" type="range" min="1" max="5000" step="1" value="525" aria-label="Current price per share slider" data-i18n-aria-label="priceSlider">
+              <div class="range-limits"><span>₦1</span><span>₦5,000</span></div>
+            </div>
+          </article>
+
+          <article class="control">
+            <button type="button" class="collapse-toggle" data-collapse-target="projectionContent" data-collapse-default="open" aria-expanded="true">
+              <span data-i18n="projectedPriceChange">Future price</span>
+              <span class="collapse-icon" aria-hidden="true">-</span>
+            </button>
+            <div class="collapsible-content" id="projectionContent">
+              <div class="control-top">
+                <div class="stepper">
+                  <button type="button" data-target="increase" data-delta="-25" aria-label="Decrease projected change" data-i18n-aria-label="decreaseProjectedChange"><svg class="icon"><use href="#icon-minus"></use></svg></button>
+                  <input id="increase" type="text" inputmode="numeric" value="25">
+                  <button type="button" data-target="increase" data-delta="25" aria-label="Increase projected change" data-i18n-aria-label="increaseProjectedChange"><svg class="icon"><use href="#icon-plus"></use></svg></button>
+                </div>
+              </div>
+              <div class="range-row">
+                <input id="increaseRange" type="range" min="-500" max="2000" step="1" value="25" aria-label="Future price slider" data-i18n-aria-label="projectedChangeSlider">
+                <div class="range-limits"><span>-₦500</span><span>+₦2,000</span></div>
+              </div>
+              <div class="quick-actions" aria-label="Preset price changes">
+                <button type="button" class="chip" data-preset="25">+₦25</button>
+                <button type="button" class="chip" data-preset="50">+₦50</button>
+                <button type="button" class="chip" data-preset="100">+₦100</button>
+                <button type="button" class="chip" data-preset="250">+₦250</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="control">
+            <button type="button" class="collapse-toggle" data-collapse-target="tradeContent" data-collapse-default="closed" aria-expanded="false">
+              <span data-i18n="addRemoveMoney">Add or remove money</span>
+              <span class="collapse-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="collapsible-content" id="tradeContent" hidden>
+              <div class="control-top">
+                <div class="label-group">
+                  <label for="tradeAmount" data-i18n="amount">Amount</label>
+                  <div class="hint" data-i18n="amountHint">Enter the naira amount and the price where the buy or sell happens.</div>
+                </div>
+                <div class="stepper">
+                  <button type="button" data-adjust-target="tradeAmount" data-adjust-delta="-10000" aria-label="Decrease transaction amount" data-i18n-aria-label="decreaseTransactionAmount"><svg class="icon"><use href="#icon-minus"></use></svg></button>
+                  <input id="tradeAmount" type="text" inputmode="numeric" value="100,000">
+                  <button type="button" data-adjust-target="tradeAmount" data-adjust-delta="10000" aria-label="Increase transaction amount" data-i18n-aria-label="increaseTransactionAmount"><svg class="icon"><use href="#icon-plus"></use></svg></button>
+                </div>
+              </div>
+              <div class="range-row">
+                <input id="tradeAmountRange" type="range" min="0" max="5000000" step="1" value="100000" aria-label="Transaction amount slider" data-i18n-aria-label="transactionAmountSlider">
+                <div class="range-limits"><span>₦0</span><span>₦5,000,000</span></div>
+              </div>
+
+              <div class="control-top trade-price-row">
+                <div class="label-group">
+                  <label for="tradePrice" data-i18n="transactionPrice">Transaction price</label>
+                  <div class="hint" data-i18n="transactionPriceHint">Shares added or removed are calculated from this price.</div>
+                </div>
+                <div class="stepper">
+                  <button type="button" data-adjust-target="tradePrice" data-adjust-delta="-25" aria-label="Decrease transaction price" data-i18n-aria-label="decreaseTransactionPrice"><svg class="icon"><use href="#icon-minus"></use></svg></button>
+                  <input id="tradePrice" type="text" inputmode="numeric" value="525">
+                  <button type="button" data-adjust-target="tradePrice" data-adjust-delta="25" aria-label="Increase transaction price" data-i18n-aria-label="increaseTransactionPrice"><svg class="icon"><use href="#icon-plus"></use></svg></button>
+                </div>
+              </div>
+              <div class="range-row">
+                <input id="tradePriceRange" type="range" min="1" max="5000" step="1" value="525" aria-label="Transaction price slider" data-i18n-aria-label="transactionPriceSlider">
+                <div class="range-limits"><span>₦1</span><span>₦5,000</span></div>
+              </div>
+
+              <div class="trade-actions">
+                <button type="button" class="trade-button buy" id="addMoney">
+                  <svg class="icon"><use href="#icon-plus"></use></svg>
+                  <span data-i18n="addMoney">Add money</span>
+                </button>
+                <button type="button" class="trade-button sell" id="removeMoney">
+                  <svg class="icon"><use href="#icon-minus"></use></svg>
+                  <span data-i18n="removeMoney">Remove money</span>
+                </button>
+              </div>
+              <div class="trade-note" id="tradeNote" aria-live="polite"></div>
+            </div>
+          </article>
+          </div>
+
+          <section class="history" aria-label="Recent calculations">
+            <div class="history-header">
+              <h2 class="history-title">
+                <button type="button" class="collapse-toggle" data-collapse-target="historyContent" data-collapse-default="closed" aria-expanded="false">
+                  <span data-i18n="recentCalculations">Recent calculations</span>
+                  <span class="collapse-icon" aria-hidden="true">+</span>
+                </button>
+              </h2>
+              <button type="button" class="clear-button" id="clearHistory">
+                <svg class="icon"><use href="#icon-trash"></use></svg>
+                <span data-i18n="clear">Clear</span>
+              </button>
+            </div>
+            <div class="history-list collapsible-content" id="historyContent" hidden>
+              <div id="historyList"></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="tab-panel" id="whatIfPanel" role="tabpanel" aria-labelledby="whatIfTab" data-tab-panel="whatIf" hidden>
+          <article class="control">
+            <h2 class="panel-heading" data-i18n="whatIfTitle">What if?</h2>
+            <div class="what-if-content" id="whatIfContent">
+              <div class="hint" data-i18n="whatIfHint">Enter the prices yourself; this page does not fetch live market data.</div>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="whatIfStock" data-i18n="stockName">Stock name</label>
+                  <input id="whatIfStock" class="field-input" type="text" placeholder="e.g. MTN Nigeria" data-i18n-placeholder="stockPlaceholder">
+                </div>
+                <div class="field">
+                  <label for="whatIfDate" data-i18n="investmentDate">Investment date</label>
+                  <input id="whatIfDate" class="field-input" type="date">
+                </div>
+              </div>
+
+              <div class="control-top">
+                <div class="label-group">
+                  <label for="whatIfAmount" data-i18n="whatIfAmount">Amount invested</label>
+                </div>
+                <div class="stepper">
+                  <button type="button" data-whatif-target="whatIfAmount" data-whatif-delta="-10000" aria-label="Decrease amount invested" data-i18n-aria-label="decreaseWhatIfAmount"><svg class="icon"><use href="#icon-minus"></use></svg></button>
+                  <input id="whatIfAmount" type="text" inputmode="numeric" value="100,000">
+                  <button type="button" data-whatif-target="whatIfAmount" data-whatif-delta="10000" aria-label="Increase amount invested" data-i18n-aria-label="increaseWhatIfAmount"><svg class="icon"><use href="#icon-plus"></use></svg></button>
+                </div>
+              </div>
+              <div class="range-row">
+                <input id="whatIfAmountRange" type="range" min="0" max="10000000" step="1" value="100000" aria-label="Amount invested slider" data-i18n-aria-label="whatIfAmountSlider">
+                <div class="range-limits"><span>₦0</span><span>₦10,000,000</span></div>
+              </div>
+
+              <div class="control-top trade-price-row">
+                <div class="label-group">
+                  <label for="whatIfBuyPrice" data-i18n="whatIfBuyPrice">Price then</label>
+                </div>
+                <div class="stepper">
+                  <button type="button" data-whatif-target="whatIfBuyPrice" data-whatif-delta="-25" aria-label="Decrease price then" data-i18n-aria-label="decreaseWhatIfBuyPrice"><svg class="icon"><use href="#icon-minus"></use></svg></button>
+                  <input id="whatIfBuyPrice" type="text" inputmode="numeric" value="525">
+                  <button type="button" data-whatif-target="whatIfBuyPrice" data-whatif-delta="25" aria-label="Increase price then" data-i18n-aria-label="increaseWhatIfBuyPrice"><svg class="icon"><use href="#icon-plus"></use></svg></button>
+                </div>
+              </div>
+              <div class="range-row">
+                <input id="whatIfBuyPriceRange" type="range" min="1" max="5000" step="1" value="525" aria-label="Price then slider" data-i18n-aria-label="whatIfBuyPriceSlider">
+                <div class="range-limits"><span>₦1</span><span>₦5,000</span></div>
+              </div>
+
+              <div class="control-top trade-price-row">
+                <div class="label-group">
+                  <label for="whatIfTodayPrice" data-i18n="whatIfTodayPrice">Price today</label>
+                </div>
+                <div class="stepper">
+                  <button type="button" data-whatif-target="whatIfTodayPrice" data-whatif-delta="-25" aria-label="Decrease price today" data-i18n-aria-label="decreaseWhatIfTodayPrice"><svg class="icon"><use href="#icon-minus"></use></svg></button>
+                  <input id="whatIfTodayPrice" type="text" inputmode="numeric" value="650">
+                  <button type="button" data-whatif-target="whatIfTodayPrice" data-whatif-delta="25" aria-label="Increase price today" data-i18n-aria-label="increaseWhatIfTodayPrice"><svg class="icon"><use href="#icon-plus"></use></svg></button>
+                </div>
+              </div>
+              <div class="range-row">
+                <input id="whatIfTodayPriceRange" type="range" min="1" max="5000" step="1" value="650" aria-label="Price today slider" data-i18n-aria-label="whatIfTodayPriceSlider">
+                <div class="range-limits"><span>₦1</span><span>₦5,000</span></div>
+              </div>
+
+              <div class="what-if-result" aria-live="polite">
+                <div class="what-if-card">
+                  <div class="what-if-label" data-i18n="whatIfShares">Shares bought</div>
+                  <div class="what-if-value" id="whatIfShares">0</div>
+                </div>
+                <div class="what-if-card">
+                  <div class="what-if-label" data-i18n="whatIfValueToday">Value today</div>
+                  <div class="what-if-value" id="whatIfValueToday">₦0</div>
+                </div>
+                <div class="what-if-card">
+                  <div class="what-if-label" data-i18n="whatIfGainLoss">Gain / loss</div>
+                  <div class="what-if-value" id="whatIfGainLoss">₦0</div>
+                </div>
+                <div class="what-if-card">
+                  <div class="what-if-label" data-i18n="whatIfReturn">Return</div>
+                  <div class="what-if-value" id="whatIfReturn">0%</div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <aside class="summary" id="summaryPanel" aria-live="polite">
+        <div class="summary-top">
+          <p class="summary-title" data-i18n="projectedValue">Projected value</p>
+          <p class="future-value" id="futureValue">₦0</p>
+          <button type="button" class="collapse-toggle summary-toggle" data-collapse-target="summaryDetails" data-collapse-default="open" aria-expanded="true">
+            <span data-i18n="details">Details</span>
+            <span class="collapse-icon" aria-hidden="true">-</span>
+          </button>
+        </div>
+        <div class="summary-body collapsible-content" id="summaryDetails">
+          <div class="metric">
+            <div class="metric-label" data-i18n="currentValue">Current value</div>
+            <div class="metric-value" id="currentValue">₦0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label" data-i18n="futurePrice">Future price</div>
+            <div class="metric-value" id="futurePrice">₦0/share</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label" data-i18n="gainLoss">Gain / loss</div>
+            <div class="metric-value gain" id="gainLoss">₦0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label" data-i18n="priceChange">Price change</div>
+            <div class="metric-value" id="changeLabel">₦0/share</div>
+          </div>
+          <div class="metric wide">
+            <div class="metric-label" data-i18n="growthMeter">Growth meter</div>
+            <div class="bar" aria-hidden="true"><div class="bar-fill" id="barFill"></div></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="resource-note">
+      <div>
+        <strong class="footer-title" data-i18n="footerTitle">Investor education</strong>
+        <p data-i18n="disclaimer">This calculator is for education only and is not financial advice.</p>
+        <div class="copyright" data-i18n="copyright">Copyright 2026 Made with ❤️ in Nigeria</div>
+        <a class="creator-link" href="https://x.com/0x0bytez" target="_blank" rel="noopener">
+          <svg class="icon"><use href="#icon-x-logo"></use></svg>
+          <span data-i18n="creatorLink">Follow 0x0bytez</span>
+        </a>
+        <a class="creator-link" href="https://x.com/intent/tweet?text=@0x0bytez%20I%20tried%20your%20Nigerian%20stock%20calculator%20and%20" target="_blank" rel="noopener">
+          <svg class="icon"><use href="#icon-x-logo"></use></svg>
+          <span data-i18n="replyOnX">Reply on X</span>
+        </a>
+      </div>
+      <div class="resource-links" aria-label="Investor education links" data-i18n-aria-label="educationLinks">
+        <button type="button" data-education-topic="ngx">
+          <svg class="icon"><use href="#icon-chart"></use></svg>
+          <span data-i18n="ngxLink">NGX</span>
+        </button>
+        <button type="button" data-education-topic="sec">
+          <svg class="icon"><use href="#icon-shield"></use></svg>
+          <span data-i18n="secLink">Nigeria SEC</span>
+        </button>
+        <button type="button" data-education-topic="stock">
+          <svg class="icon"><use href="#icon-book"></use></svg>
+          <span data-i18n="stockLink">What's a Stock?</span>
+        </button>
+        <button type="button" data-education-topic="ipo">
+          <svg class="icon"><use href="#icon-building"></use></svg>
+          <span data-i18n="ipoLink">What's an IPO?</span>
+        </button>
+      </div>
+    </footer>
+
+    <div class="education-modal" id="educationModal" role="dialog" aria-modal="true" aria-labelledby="educationTitle" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 class="modal-title" id="educationTitle"></h2>
+          <button type="button" class="modal-close icon-button" id="educationClose" aria-label="Close" data-i18n-aria-label="closeModal"><svg class="icon"><use href="#icon-x"></use></svg></button>
+        </div>
+        <div class="modal-body">
+          <p id="educationBody"></p>
+          <a class="modal-link" id="educationReadMore" href="#" target="_blank" rel="noopener" data-i18n="readMore">Read more</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="education-modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 class="modal-title" id="settingsTitle" data-i18n="settingsTitle">Settings</h2>
+          <button type="button" class="modal-close icon-button" id="settingsClose" aria-label="Close settings" data-i18n-aria-label="closeSettings"><svg class="icon"><use href="#icon-x"></use></svg></button>
+        </div>
+        <div class="modal-body settings-fields">
+          <div class="language-control">
+            <label for="language" data-i18n="language">Language</label>
+            <select id="language" aria-label="Language">
+              <option value="pcm">Pidgin</option>
+              <option value="en">English</option>
+              <option value="yo">Yoruba</option>
+              <option value="ha">Hausa</option>
+              <option value="ig">Igbo</option>
+            </select>
+          </div>
+          <button type="button" class="theme-toggle" id="themeToggle">
+            <svg class="icon"><use id="themeIcon" href="#icon-moon"></use></svg>
+            <span data-theme-label data-i18n="darkMode">Dark mode</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const formatter = new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      maximumFractionDigits: 0
+    });
+
+    const HISTORY_KEY = "share-growth-simulator:recent-naira-calculations";
+    const COLLAPSE_KEY = "share-growth-simulator:collapsed-sections";
+    const LANGUAGE_KEY = "share-growth-simulator:language";
+    const THEME_KEY = "share-growth-simulator:theme";
+    const WHAT_IF_KEY = "share-growth-simulator:what-if";
+    const ACTIVE_TAB_KEY = "share-growth-simulator:active-tab";
+    const MAX_HISTORY_ITEMS = 6;
+    let saveTimer;
+    let currentLanguage = "pcm";
+    let currentTheme = "light";
+
+    const dictionaries = {
+      en: {
+        appTitle: "Stock Calculator",
+        subtitle: "Simulate market positions.",
+        language: "Language",
+        moreSettings: "More settings",
+        settingsTitle: "Settings",
+        closeSettings: "Close settings",
+        calculatorMode: "Calculator mode",
+        simulatorTab: "My shares",
+        whatIfTab: "What if I invested?",
+        darkMode: "Dark mode",
+        lightMode: "Light mode",
+        sharesOwned: "Shares owned",
+        sharesHint: "Use the slider, type a number, or step with the buttons.",
+        decreaseShares: "Decrease shares",
+        increaseShares: "Increase shares",
+        sharesSlider: "Shares owned slider",
+        sharesMax: "100,000 shares",
+        currentPrice: "(₦) Current price per share",
+        currentPriceHint: "Defaults to ₦525 per share.",
+        decreasePrice: "Decrease current share price",
+        increasePrice: "Increase current share price",
+        priceSlider: "Current price per share slider",
+        projectedPriceChange: "(₦) Future price",
+        decreaseProjectedChange: "Decrease projected change",
+        increaseProjectedChange: "Increase projected change",
+        projectedChangeSlider: "Future price slider",
+        addRemoveMoney: "Add or remove money",
+        amount: "(₦) Amount",
+        amountHint: "Enter the naira amount and the price where the buy or sell happens.",
+        decreaseTransactionAmount: "Decrease transaction amount",
+        increaseTransactionAmount: "Increase transaction amount",
+        transactionAmountSlider: "Transaction amount slider",
+        transactionPrice: "(₦) Transaction price",
+        transactionPriceHint: "Shares added or removed are calculated from this price.",
+        decreaseTransactionPrice: "Decrease transaction price",
+        increaseTransactionPrice: "Increase transaction price",
+        transactionPriceSlider: "Transaction price slider",
+        addMoney: "Add money",
+        removeMoney: "Remove money",
+        recentCalculations: "Recent calculations",
+        clear: "Clear",
+        projectedValue: "Projected value",
+        details: "Details",
+        currentValue: "Current value",
+        futurePrice: "(₦) Future price",
+        gainLoss: "Gain / loss",
+        priceChange: "(₦) Price change",
+        growthMeter: "Growth meter",
+        footerTitle: "Investor education",
+        disclaimer: "This calculator is for education only and is not financial advice.",
+        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        creatorLink: "Follow 0x0bytez",
+        replyOnX: "Reply on X",
+        educationLinks: "Investor education links",
+        ngxLink: "NGX",
+        secLink: "Nigeria SEC",
+        stockLink: "Stock basics",
+        ipoLink: "IPO basics",
+        whatIfTitle: "What if?",
+        whatIfHint: "Enter the prices yourself; this page does not fetch live market data.",
+        stockName: "Stock name",
+        stockPlaceholder: "e.g. MTN Nigeria",
+        investmentDate: "Investment date",
+        whatIfAmount: "(₦) Amount invested",
+        whatIfBuyPrice: "(₦) Price then",
+        whatIfTodayPrice: "(₦) Price today",
+        decreaseWhatIfAmount: "Decrease amount invested",
+        increaseWhatIfAmount: "Increase amount invested",
+        whatIfAmountSlider: "Amount invested slider",
+        decreaseWhatIfBuyPrice: "Decrease price then",
+        increaseWhatIfBuyPrice: "Increase price then",
+        whatIfBuyPriceSlider: "Price then slider",
+        decreaseWhatIfTodayPrice: "Decrease price today",
+        increaseWhatIfTodayPrice: "Increase price today",
+        whatIfTodayPriceSlider: "Price today slider",
+        whatIfShares: "Shares bought",
+        whatIfValueToday: "Value today",
+        whatIfGainLoss: "Gain / loss",
+        whatIfReturn: "Return",
+        closeModal: "Close",
+        readMore: "Read more",
+        education: {
+          ngx: {
+            title: "What is NGX?",
+            body: "NGX is like the big market where people can buy and sell shares of listed Nigerian companies. Instead of tomatoes or rice, the things being traded are company shares. If a company is listed there, investors can check its price and trade through approved stockbrokers.",
+            href: "https://web.archive.org/web/20231028162316/https://ngxgroup.com/about"
+          },
+          sec: {
+            title: "What is Nigeria SEC?",
+            body: "Nigeria SEC is like the market referee. Its job is to set rules for the capital market and help protect investors. For example, when companies, brokers, or investment products operate in Nigeria, SEC oversight helps make sure they follow the rules.",
+            href: "https://web.archive.org/web/20150411103419/http://www.sec.gov.ng/what-we-do.html"
+          },
+          stock: {
+            title: "What is a stock?",
+            body: "Think of a company like a big pot of jollof rice at a party. A stock is one small spoon from that pot. If you buy shares in a Nigerian company, you own a tiny part of it. If the company does well and more people want its shares, your shares may become worth more. If the company struggles or people stop wanting the shares, the value may fall.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/s/stockmarket.asp"
+          },
+          ipo: {
+            title: "What is an IPO?",
+            body: "An IPO is like when a family business that only family members owned before now opens the gate for the public to buy small parts of it. In Nigeria, that can mean the company lists on an exchange so everyday investors can buy shares. It does not mean the price must go up. It only means the public can now join as owners.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/i/ipo.asp"
+          }
+        },
+        shareUnit: "share",
+        emptyHistory: "Recent calculations will appear here after you adjust a value.",
+        enterAmountFirst: "Enter an amount and transaction price first.",
+        addedShares: ({ shares, amount, price }) => `Added ${shares} shares from ${amount} at ${price}/share.`,
+        removedShares: ({ shares, amount, price }) => `Removed ${shares} shares worth ${amount} at ${price}/share.`,
+        historyMain: ({ shares, price, futureValue }) => `${shares} shares at ${price} -> ${futureValue}`,
+        historyMeta: ({ change, futurePrice }) => `${change}/share change, ${futurePrice}/share`
+      },
+      pcm: {
+        appTitle: "Stock Calculator",
+        subtitle: "Check how your market position fit move.",
+        language: "Language",
+        moreSettings: "More settings",
+        settingsTitle: "Settings",
+        closeSettings: "Close settings",
+        calculatorMode: "Calculator mode",
+        simulatorTab: "My shares",
+        whatIfTab: "What if I invest?",
+        darkMode: "Dark mode",
+        lightMode: "Light mode",
+        sharesOwned: "Shares wey you get",
+        sharesHint: "Use slider, type number, or use the plus and minus buttons.",
+        decreaseShares: "Reduce shares",
+        increaseShares: "Add shares",
+        sharesSlider: "Shares slider",
+        sharesMax: "100,000 shares",
+        currentPrice: "(₦) Current price for one share",
+        currentPriceHint: "E dey start with ₦525 for one share.",
+        decreasePrice: "Reduce current share price",
+        increasePrice: "Add current share price",
+        priceSlider: "Current price slider",
+        projectedPriceChange: "(₦) Price change wey you expect",
+        decreaseProjectedChange: "Reduce expected price change",
+        increaseProjectedChange: "Add expected price change",
+        projectedChangeSlider: "Expected price change slider",
+        addRemoveMoney: "Add or remove money",
+        amount: "(₦) Amount",
+        amountHint: "Put the naira amount and the price where you wan buy or sell.",
+        decreaseTransactionAmount: "Reduce transaction amount",
+        increaseTransactionAmount: "Add transaction amount",
+        transactionAmountSlider: "Transaction amount slider",
+        transactionPrice: "(₦) Transaction price",
+        transactionPriceHint: "Shares wey go add or comot go use this price.",
+        decreaseTransactionPrice: "Reduce transaction price",
+        increaseTransactionPrice: "Add transaction price",
+        transactionPriceSlider: "Transaction price slider",
+        addMoney: "Add money",
+        removeMoney: "Remove money",
+        recentCalculations: "Recent calculations",
+        clear: "Clear",
+        projectedValue: "Value wey you expect",
+        details: "Details",
+        currentValue: "Current value",
+        futurePrice: "(₦) Future price",
+        gainLoss: "Gain / loss",
+        priceChange: "(₦) Price change",
+        growthMeter: "Growth meter",
+        footerTitle: "Investor education",
+        disclaimer: "This calculator na for learning only; e no be financial advice.",
+        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        creatorLink: "Follow 0x0bytez",
+        replyOnX: "Reply on X",
+        educationLinks: "Investor education links",
+        ngxLink: "NGX",
+        secLink: "Nigeria SEC",
+        stockLink: "Wetin be Stock?",
+        ipoLink: "Wetin be IPO?",
+        whatIfTitle: "What if?",
+        whatIfHint: "Put the prices yourself; this page no dey fetch live market data.",
+        stockName: "Stock name",
+        stockPlaceholder: "e.g. MTN Nigeria",
+        investmentDate: "Date wey you invest",
+        whatIfAmount: "(₦) Money wey you invest",
+        whatIfBuyPrice: "(₦) Price that time",
+        whatIfTodayPrice: "(₦) Price today",
+        decreaseWhatIfAmount: "Reduce money wey you invest",
+        increaseWhatIfAmount: "Add money wey you invest",
+        whatIfAmountSlider: "Money wey you invest slider",
+        decreaseWhatIfBuyPrice: "Reduce price that time",
+        increaseWhatIfBuyPrice: "Add price that time",
+        whatIfBuyPriceSlider: "Price that time slider",
+        decreaseWhatIfTodayPrice: "Reduce price today",
+        increaseWhatIfTodayPrice: "Add price today",
+        whatIfTodayPriceSlider: "Price today slider",
+        whatIfShares: "Shares wey you buy",
+        whatIfValueToday: "Value today",
+        whatIfGainLoss: "Gain / loss",
+        whatIfReturn: "Return",
+        closeModal: "Close",
+        readMore: "Read more",
+        education: {
+          ngx: {
+            title: "Wetin be NGX?",
+            body: "NGX be like big market where people fit buy and sell shares of Nigerian companies wey don list. No be tomato or rice dem dey sell there; na company shares. If company dey listed there, investors fit check price and trade through approved stockbrokers.",
+            href: "https://web.archive.org/web/20231028162316/https://ngxgroup.com/about"
+          },
+          sec: {
+            title: "Wetin be Nigeria SEC?",
+            body: "Nigeria SEC be like referee for capital market. Their work na to set rules and help protect investors. For example, if companies, brokers, or investment products dey operate for Nigeria, SEC oversight dey help make sure say dem follow rules.",
+            href: "https://web.archive.org/web/20150411103419/http://www.sec.gov.ng/what-we-do.html"
+          },
+          stock: {
+            title: "Wetin be stock?",
+            body: "Think of company like big pot of party jollof. Stock na small spoon from that pot. If you buy shares for Nigerian company, you get tiny part of that company. If the company dey do well and plenty people want buy the shares, your own fit worth more. If business no dey move well or people no want the shares again, the value fit drop.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/s/stockmarket.asp"
+          },
+          ipo: {
+            title: "Wetin be IPO?",
+            body: "IPO be like when family business wey only family people own before open gate make everybody fit buy small part. For Nigeria, e fit mean say the company list for exchange so normal investors fit buy shares. E no mean say price must go up. E just mean public people fit now join as owners.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/i/ipo.asp"
+          }
+        },
+        shareUnit: "share",
+        emptyHistory: "Recent calculations go show here after you change any value.",
+        enterAmountFirst: "Put amount and transaction price first.",
+        addedShares: ({ shares, amount, price }) => `Added ${shares} shares from ${amount} at ${price}/share.`,
+        removedShares: ({ shares, amount, price }) => `Removed ${shares} shares worth ${amount} at ${price}/share.`,
+        historyMain: ({ shares, price, futureValue }) => `${shares} shares at ${price} -> ${futureValue}`,
+        historyMeta: ({ change, futurePrice }) => `${change}/share change, ${futurePrice}/share`
+      },
+      yo: {
+        appTitle: "Kalikuleto Oja Ipin",
+        subtitle: "Se afiwe ipo idoko-owo ninu oja.",
+        language: "Ede",
+        moreSettings: "Awon eto miran",
+        settingsTitle: "Eto",
+        closeSettings: "Pa eto",
+        calculatorMode: "Ipo kalikuleto",
+        simulatorTab: "Awon ipin mi",
+        whatIfTab: "Bi mo ba se idokoowo?",
+        darkMode: "Ipo dudu",
+        lightMode: "Ipo funfun",
+        sharesOwned: "Ipin ti o ni",
+        sharesHint: "Lo slider, ko nomba, tabi lo botini plus ati minus.",
+        decreaseShares: "Din ipin ku",
+        increaseShares: "Fi ipin kun",
+        sharesSlider: "Slider fun ipin",
+        sharesMax: "100,000 ipin",
+        currentPrice: "(₦) Owo ipin kan bayi",
+        currentPriceHint: "Aiyipada je ₦525 fun ipin kan.",
+        decreasePrice: "Din owo ipin bayi ku",
+        increasePrice: "Fi owo ipin bayi kun",
+        priceSlider: "Slider fun owo ipin bayi",
+        projectedPriceChange: "(₦) Iyipada owo ti a reti",
+        decreaseProjectedChange: "Din iyipada ti a reti ku",
+        increaseProjectedChange: "Fi iyipada ti a reti kun",
+        projectedChangeSlider: "Slider fun iyipada owo ti a reti",
+        addRemoveMoney: "Fi owo kun tabi yo owo kuro",
+        amount: "(₦) Iye owo",
+        amountHint: "Ko iye naira ati owo ipin ibi ti rira tabi tita ti sele.",
+        decreaseTransactionAmount: "Din iye iṣowo ku",
+        increaseTransactionAmount: "Fi iye iṣowo kun",
+        transactionAmountSlider: "Slider fun iye iṣowo",
+        transactionPrice: "(₦) Owo iṣowo",
+        transactionPriceHint: "Ipin ti a fi kun tabi yo kuro da lori owo yi.",
+        decreaseTransactionPrice: "Din owo iṣowo ku",
+        increaseTransactionPrice: "Fi owo iṣowo kun",
+        transactionPriceSlider: "Slider fun owo iṣowo",
+        addMoney: "Fi owo kun",
+        removeMoney: "Yo owo kuro",
+        recentCalculations: "Awon isiro to se kẹhin",
+        clear: "Pa kuro",
+        projectedValue: "Iye ti a reti",
+        details: "Alaye",
+        currentValue: "Iye bayi",
+        futurePrice: "(₦) Owo ojo iwaju",
+        gainLoss: "Ere / adanu",
+        priceChange: "(₦) Iyipada owo",
+        growthMeter: "Mita idagbasoke",
+        footerTitle: "Eko fun oludokoowo",
+        disclaimer: "Kalikuleto yi wa fun eko nikan; kii se imoran owo.",
+        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        creatorLink: "Tele 0x0bytez",
+        replyOnX: "Fi reply ranse lori X",
+        educationLinks: "Awon linki eko fun oludokoowo",
+        ngxLink: "NGX",
+        secLink: "SEC Nigeria",
+        stockLink: "Ipile stock",
+        ipoLink: "Ipile IPO",
+        whatIfTitle: "Bi o ba je pe?",
+        whatIfHint: "Ko awon owo naa funra re; oju iwe yi ko gba data oja laaye.",
+        stockName: "Oruko stock",
+        stockPlaceholder: "fun apere MTN Nigeria",
+        investmentDate: "Ojo idokoowo",
+        whatIfAmount: "(₦) Iye ti o fi se idokoowo",
+        whatIfBuyPrice: "(₦) Owo nigba naa",
+        whatIfTodayPrice: "(₦) Owo loni",
+        decreaseWhatIfAmount: "Din iye idokoowo ku",
+        increaseWhatIfAmount: "Fi iye idokoowo kun",
+        whatIfAmountSlider: "Slider iye idokoowo",
+        decreaseWhatIfBuyPrice: "Din owo nigba naa ku",
+        increaseWhatIfBuyPrice: "Fi owo nigba naa kun",
+        whatIfBuyPriceSlider: "Slider owo nigba naa",
+        decreaseWhatIfTodayPrice: "Din owo loni ku",
+        increaseWhatIfTodayPrice: "Fi owo loni kun",
+        whatIfTodayPriceSlider: "Slider owo loni",
+        whatIfShares: "Ipin ti o ra",
+        whatIfValueToday: "Iye loni",
+        whatIfGainLoss: "Ere / adanu",
+        whatIfReturn: "Return",
+        closeModal: "Pa",
+        readMore: "Ka si i",
+        education: {
+          ngx: {
+            title: "Kini NGX?",
+            body: "NGX dabi oja nla ti eniyan ti le ra ati ta ipin awon ile ise Naijiria ti won wa lori akojopo. Kii se tomato tabi iresi ni won n ta; ipin ile ise ni. Ti ile ise ba wa lori NGX, oludokoowo le wo owo re ki o ra tabi ta pelu stockbroker ti a fọwọsi.",
+            href: "https://web.archive.org/web/20231028162316/https://ngxgroup.com/about"
+          },
+          sec: {
+            title: "Kini SEC Nigeria?",
+            body: "SEC Nigeria dabi referee fun oja olu. Ise won ni lati se ofin ati lati ran awon oludokoowo lowo ki won ma ba subu sinu ewu. Fun apere, awon ile ise, broker, ati awon ohun idokoowo ni Naijiria gbodo tele awon ilana SEC.",
+            href: "https://web.archive.org/web/20150411103419/http://www.sec.gov.ng/what-we-do.html"
+          },
+          stock: {
+            title: "Kini stock?",
+            body: "Foju inu wo ile ise bi ikoko jollof nla ni ayeye. Stock je sibi kekere ninu ikoko naa. Ti o ba ra ipin ninu ile ise Naijiria, o ni apa kekere ninu ile ise naa. Ti ile ise ba n se daadaa ti opolopo eniyan si fe ipin re, iye ipin re le goke. Ti ile ise ba n koju wahala tabi eniyan ko fe ipin naa mo, iye re le sokale.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/s/stockmarket.asp"
+          },
+          ipo: {
+            title: "Kini IPO?",
+            body: "IPO dabi igba ti business idile kan, ti awon ara idile nikan ni tele, ba si ilekun fun gbogbo eniyan lati ra apa kekere ninu re. Ni Naijiria, eyi le tumo si pe ile ise naa daruko lori exchange ki awon oludokoowo le ra ipin. Ko tumo si pe owo ipin gbodo goke. O tumo si pe gbogbo eniyan le darapo gege bi eni to ni ipin.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/i/ipo.asp"
+          }
+        },
+        shareUnit: "ipin",
+        emptyHistory: "Awon isiro to se kẹhin yoo han nibi leyin ti o ba yi iye kan pada.",
+        enterAmountFirst: "Ko iye owo ati owo iṣowo koko.",
+        addedShares: ({ shares, amount, price }) => `A fi ${shares} ipin kun pelu ${amount} ni ${price}/ipin.`,
+        removedShares: ({ shares, amount, price }) => `A yo ${shares} ipin kuro ti iye re je ${amount} ni ${price}/ipin.`,
+        historyMain: ({ shares, price, futureValue }) => `${shares} ipin ni ${price} -> ${futureValue}`,
+        historyMeta: ({ change, futurePrice }) => `${change}/ipin iyipada, ${futurePrice}/ipin`
+      },
+      ha: {
+        appTitle: "Kalkuletan Hannun Jari",
+        subtitle: "Kwaikwayi matsayin kasuwa.",
+        language: "Harshe",
+        moreSettings: "Karin saituna",
+        settingsTitle: "Saituna",
+        closeSettings: "Rufe saituna",
+        calculatorMode: "Yanayin kalkuleta",
+        simulatorTab: "Hannuna",
+        whatIfTab: "Idan na zuba jari fa?",
+        darkMode: "Yanayin duhu",
+        lightMode: "Yanayin haske",
+        sharesOwned: "Hannun jarin da kake da su",
+        sharesHint: "Yi amfani da slider, rubuta lamba, ko amfani da plus da minus.",
+        decreaseShares: "Rage hannun jari",
+        increaseShares: "Kara hannun jari",
+        sharesSlider: "Slider na hannun jari",
+        sharesMax: "100,000 hannun jari",
+        currentPrice: "(₦) Farashin hannun jari daya yanzu",
+        currentPriceHint: "Asali ₦525 ne ga hannun jari daya.",
+        decreasePrice: "Rage farashin yanzu",
+        increasePrice: "Kara farashin yanzu",
+        priceSlider: "Slider na farashin yanzu",
+        projectedPriceChange: "(₦) Canjin farashi da ake tsammani",
+        decreaseProjectedChange: "Rage canjin da ake tsammani",
+        increaseProjectedChange: "Kara canjin da ake tsammani",
+        projectedChangeSlider: "Slider na canjin farashi",
+        addRemoveMoney: "Kara ko cire kudi",
+        amount: "(₦) Adadi",
+        amountHint: "Shigar da kudin naira da farashin da za a saya ko sayar.",
+        decreaseTransactionAmount: "Rage adadin ciniki",
+        increaseTransactionAmount: "Kara adadin ciniki",
+        transactionAmountSlider: "Slider na adadin ciniki",
+        transactionPrice: "(₦) Farashin ciniki",
+        transactionPriceHint: "Ana kirga hannun jarin da aka kara ko cire daga wannan farashi.",
+        decreaseTransactionPrice: "Rage farashin ciniki",
+        increaseTransactionPrice: "Kara farashin ciniki",
+        transactionPriceSlider: "Slider na farashin ciniki",
+        addMoney: "Kara kudi",
+        removeMoney: "Cire kudi",
+        recentCalculations: "Lissafin baya-bayan nan",
+        clear: "Goge",
+        projectedValue: "Kimar da ake tsammani",
+        details: "Bayani",
+        currentValue: "Kimar yanzu",
+        futurePrice: "(₦) Farashin gaba",
+        gainLoss: "Riba / asara",
+        priceChange: "(₦) Canjin farashi",
+        growthMeter: "Mizanin girma",
+        footerTitle: "Ilimin masu zuba jari",
+        disclaimer: "Wannan kalkuleta na ilimi ne kawai; ba shawarar kudi ba ce.",
+        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        creatorLink: "Bi 0x0bytez",
+        replyOnX: "Amsa a X",
+        educationLinks: "Hanyoyin ilimin masu zuba jari",
+        ngxLink: "NGX",
+        secLink: "SEC Nigeria",
+        stockLink: "Asalin stock",
+        ipoLink: "Asalin IPO",
+        whatIfTitle: "Idan haka fa?",
+        whatIfHint: "Shigar da farashin da kanka; wannan shafin ba ya dauko bayanan kasuwa kai tsaye.",
+        stockName: "Sunan stock",
+        stockPlaceholder: "misali MTN Nigeria",
+        investmentDate: "Ranar zuba jari",
+        whatIfAmount: "(₦) Kudin da aka zuba",
+        whatIfBuyPrice: "(₦) Farashin lokacin",
+        whatIfTodayPrice: "(₦) Farashin yau",
+        decreaseWhatIfAmount: "Rage kudin da aka zuba",
+        increaseWhatIfAmount: "Kara kudin da aka zuba",
+        whatIfAmountSlider: "Slider kudin da aka zuba",
+        decreaseWhatIfBuyPrice: "Rage farashin lokacin",
+        increaseWhatIfBuyPrice: "Kara farashin lokacin",
+        whatIfBuyPriceSlider: "Slider farashin lokacin",
+        decreaseWhatIfTodayPrice: "Rage farashin yau",
+        increaseWhatIfTodayPrice: "Kara farashin yau",
+        whatIfTodayPriceSlider: "Slider farashin yau",
+        whatIfShares: "Hannun jarin da aka saya",
+        whatIfValueToday: "Kimar yau",
+        whatIfGainLoss: "Riba / asara",
+        whatIfReturn: "Return",
+        closeModal: "Rufe",
+        readMore: "Kara karatu",
+        education: {
+          ngx: {
+            title: "Menene NGX?",
+            body: "NGX kamar babban kasuwa ce inda mutane ke iya saya da sayar da hannun jarin kamfanonin Najeriya da aka lissafa. Ba tumatir ko shinkafa ake sayarwa ba; hannun jarin kamfani ake ciniki da shi. Idan kamfani yana kan NGX, masu zuba jari na iya duba farashi su yi ciniki ta hannun stockbroker da aka amince da shi.",
+            href: "https://web.archive.org/web/20231028162316/https://ngxgroup.com/about"
+          },
+          sec: {
+            title: "Menene SEC Nigeria?",
+            body: "SEC Nigeria kamar alkalin kasuwar kudi ce. Aikinta shi ne sa dokoki da taimakawa wajen kare masu zuba jari. Misali, kamfanoni, brokers, da kayayyakin zuba jari a Najeriya ya kamata su bi dokokin SEC.",
+            href: "https://web.archive.org/web/20150411103419/http://www.sec.gov.ng/what-we-do.html"
+          },
+          stock: {
+            title: "Menene stock?",
+            body: "Ka dauka kamfani kamar babban tukunyar jollof a wajen biki. Stock kamar karamin cokali ne daga wannan tukunyar. Idan ka sayi hannun jari a kamfanin Najeriya, kana da karamin kaso na kamfanin. Idan kamfanin yana tafiya lafiya kuma mutane da yawa suna son hannun jarinsa, kimarsa na iya tashi. Idan kamfanin ya samu matsala ko mutane ba sa so, kimarsa na iya sauka.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/s/stockmarket.asp"
+          },
+          ipo: {
+            title: "Menene IPO?",
+            body: "IPO kamar lokacin da kasuwancin iyali, wanda iyali kadai ke da shi a baya, ya bude kofa ga jama'a su sayi kananan kaso. A Najeriya, hakan na iya nufin kamfanin ya shiga kasuwar musayar hannun jari domin mutane su iya sayen hannun jari. Ba ya nufin farashi dole ya tashi. Yana nufin jama'a za su iya zama masu mallakar kaso.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/i/ipo.asp"
+          }
+        },
+        shareUnit: "hannu",
+        emptyHistory: "Lissafin baya-bayan nan zai bayyana a nan bayan ka canza wata kima.",
+        enterAmountFirst: "Shigar da adadi da farashin ciniki tukuna.",
+        addedShares: ({ shares, amount, price }) => `An kara ${shares} hannun jari daga ${amount} a ${price}/hannu.`,
+        removedShares: ({ shares, amount, price }) => `An cire ${shares} hannun jari na ${amount} a ${price}/hannu.`,
+        historyMain: ({ shares, price, futureValue }) => `${shares} hannun jari a ${price} -> ${futureValue}`,
+        historyMeta: ({ change, futurePrice }) => `${change}/hannu canji, ${futurePrice}/hannu`
+      },
+      ig: {
+        appTitle: "Kalkuletọ Akụkụ Ahịa",
+        subtitle: "Mee nnwale ọnọdụ ahịa.",
+        language: "Asụsụ",
+        moreSettings: "Ntọala ndị ọzọ",
+        settingsTitle: "Ntọala",
+        closeSettings: "Mechie ntọala",
+        calculatorMode: "Ụdị kalkuletọ",
+        simulatorTab: "Akụkụ m",
+        whatIfTab: "Ọ bụrụ na m tinyere ego?",
+        darkMode: "Ọnọdụ ọchịchịrị",
+        lightMode: "Ọnọdụ ìhè",
+        sharesOwned: "Akụkụ ị nwere",
+        sharesHint: "Jiri slider, dee ọnụọgụ, ma ọ bụ jiri bọtịnụ plus na minus.",
+        decreaseShares: "Belata akụkụ",
+        increaseShares: "Tinye akụkụ",
+        sharesSlider: "Slider akụkụ",
+        sharesMax: "100,000 akụkụ",
+        currentPrice: "(₦) Ọnụahịa otu akụkụ ugbu a",
+        currentPriceHint: "Ndabara bu ₦525 maka otu akụkụ.",
+        decreasePrice: "Belata ọnụahịa ugbu a",
+        increasePrice: "Tinye ọnụahịa ugbu a",
+        priceSlider: "Slider ọnụahịa ugbu a",
+        projectedPriceChange: "(₦) Mgbanwe ọnụahịa a tụrụ anya",
+        decreaseProjectedChange: "Belata mgbanwe a tụrụ anya",
+        increaseProjectedChange: "Tinye mgbanwe a tụrụ anya",
+        projectedChangeSlider: "Slider mgbanwe ọnụahịa",
+        addRemoveMoney: "Tinye ma ọ bụ wepụ ego",
+        amount: "(₦) Ego",
+        amountHint: "Tinye ego naira na ọnụahịa ebe ị ga-azụta ma ọ bụ ree.",
+        decreaseTransactionAmount: "Belata ego azụmahịa",
+        increaseTransactionAmount: "Tinye ego azụmahịa",
+        transactionAmountSlider: "Slider ego azụmahịa",
+        transactionPrice: "(₦) Ọnụahịa azụmahịa",
+        transactionPriceHint: "A na-agbakọ akụkụ agbakwunyere ma ọ bụ wepụrụ site na ọnụahịa a.",
+        decreaseTransactionPrice: "Belata ọnụahịa azụmahịa",
+        increaseTransactionPrice: "Tinye ọnụahịa azụmahịa",
+        transactionPriceSlider: "Slider ọnụahịa azụmahịa",
+        addMoney: "Tinye ego",
+        removeMoney: "Wepụ ego",
+        recentCalculations: "Ngụkọ ndị gara aga",
+        clear: "Hichapụ",
+        projectedValue: "Uru a tụrụ anya",
+        details: "Nkọwa",
+        currentValue: "Uru ugbu a",
+        futurePrice: "(₦) Ọnụahịa n'ọdịnihu",
+        gainLoss: "Uru / mfu",
+        priceChange: "(₦) Mgbanwe ọnụahịa",
+        growthMeter: "Mita uto",
+        footerTitle: "Mmụta maka itinye ego",
+        disclaimer: "Kalkuletọ a bu maka mmụta naanị; ọ bụghị ndụmọdụ ego.",
+        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        creatorLink: "Soro 0x0bytez",
+        replyOnX: "Zaghachi na X",
+        educationLinks: "Njikọ mmụta maka itinye ego",
+        ngxLink: "NGX",
+        secLink: "SEC Nigeria",
+        stockLink: "Ntọala stock",
+        ipoLink: "Ntọala IPO",
+        whatIfTitle: "Gịnị ma ọ bụrụ?",
+        whatIfHint: "Tinye ọnụahịa n'onwe gị; ibe a anaghị ebute data ahịa ozugbo.",
+        stockName: "Aha stock",
+        stockPlaceholder: "dịka MTN Nigeria",
+        investmentDate: "Ụbọchị itinye ego",
+        whatIfAmount: "(₦) Ego etinyere",
+        whatIfBuyPrice: "(₦) Ọnụahịa mgbe ahụ",
+        whatIfTodayPrice: "(₦) Ọnụahịa taa",
+        decreaseWhatIfAmount: "Belata ego etinyere",
+        increaseWhatIfAmount: "Tinye ego etinyere",
+        whatIfAmountSlider: "Slider ego etinyere",
+        decreaseWhatIfBuyPrice: "Belata ọnụahịa mgbe ahụ",
+        increaseWhatIfBuyPrice: "Tinye ọnụahịa mgbe ahụ",
+        whatIfBuyPriceSlider: "Slider ọnụahịa mgbe ahụ",
+        decreaseWhatIfTodayPrice: "Belata ọnụahịa taa",
+        increaseWhatIfTodayPrice: "Tinye ọnụahịa taa",
+        whatIfTodayPriceSlider: "Slider ọnụahịa taa",
+        whatIfShares: "Akụkụ azụtara",
+        whatIfValueToday: "Uru taa",
+        whatIfGainLoss: "Uru / mfu",
+        whatIfReturn: "Return",
+        closeModal: "Mechie",
+        readMore: "Gụọ ọzọ",
+        education: {
+          ngx: {
+            title: "Gịnị bụ NGX?",
+            body: "NGX dị ka nnukwu ahịa ebe mmadụ nwere ike ịzụta ma ree shares nke ụlọ ọrụ Naịjirịa edepụtara. Ọ bụghị tomato ma ọ bụ osikapa ka a na-ere ebe ahụ; ọ bụ akụkụ ụlọ ọrụ. Ọ bụrụ na ụlọ ọrụ dị na NGX, ndị na-etinye ego nwere ike lelee ọnụahịa ya ma zụta ma ọ bụ ree site n'aka stockbroker akwadoro.",
+            href: "https://web.archive.org/web/20231028162316/https://ngxgroup.com/about"
+          },
+          sec: {
+            title: "Gịnị bụ SEC Nigeria?",
+            body: "SEC Nigeria dị ka referee maka ahịa ego. Ọrụ ya bụ ide iwu ma nyere aka chebe ndị na-etinye ego. Dịka ọmụmaatụ, ụlọ ọrụ, brokers, na ngwaahịa itinye ego na Naịjirịa kwesịrị iso iwu SEC.",
+            href: "https://web.archive.org/web/20150411103419/http://www.sec.gov.ng/what-we-do.html"
+          },
+          stock: {
+            title: "Gịnị bụ stock?",
+            body: "Chee ụlọ ọrụ dịka nnukwu ite jollof n'emume. Stock bụ obere ngaji site n'ite ahụ. Ọ bụrụ na ị zụta shares n'ụlọ ọrụ Naịjirịa, ị nwere obere akụkụ n'ụlọ ọrụ ahụ. Ọ bụrụ na ụlọ ọrụ na-eme nke ọma ma ọtụtụ mmadụ chọrọ shares ya, uru gị nwere ike ịrị elu. Ọ bụrụ na ụlọ ọrụ nwere nsogbu ma ọ bụ mmadụ achọghị shares ahụ, uru ya nwere ike ịda.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/s/stockmarket.asp"
+          },
+          ipo: {
+            title: "Gịnị bụ IPO?",
+            body: "IPO dị ka mgbe azụmahịa ezinụlọ, nke naanị ezinụlọ nwebu, mepere ọnụ ụzọ ka ọha mmadụ zụta obere akụkụ. Na Naịjirịa, nke a nwere ike ịbụ mgbe ụlọ ọrụ tinyere shares ya na exchange ka ndị mmadụ zụta. Ọ pụtaghị na ọnụahịa ga-arịrịrị elu. Ọ pụtara na ọha mmadụ nwere ike isonye dịka ndị nwe obere akụkụ.",
+            href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/i/ipo.asp"
+          }
+        },
+        shareUnit: "akụkụ",
+        emptyHistory: "Ngụkọ ndị gara aga ga-apụta ebe a mgbe ị gbanwere uru.",
+        enterAmountFirst: "Tinye ego na ọnụahịa azụmahịa mbụ.",
+        addedShares: ({ shares, amount, price }) => `A tinyere ${shares} akụkụ site na ${amount} na ${price}/akụkụ.`,
+        removedShares: ({ shares, amount, price }) => `A wepụrụ ${shares} akụkụ ruru ${amount} na ${price}/akụkụ.`,
+        historyMain: ({ shares, price, futureValue }) => `${shares} akụkụ na ${price} -> ${futureValue}`,
+        historyMeta: ({ change, futurePrice }) => `${change}/akụkụ mgbanwe, ${futurePrice}/akụkụ`
+      }
+    };
+
+    const controls = {
+      shares: {
+        input: document.getElementById("shares"),
+        range: document.getElementById("sharesRange"),
+        min: 0,
+        max: 100000
+      },
+      price: {
+        input: document.getElementById("price"),
+        range: document.getElementById("priceRange"),
+        min: 1,
+        max: 5000
+      },
+      increase: {
+        input: document.getElementById("increase"),
+        range: document.getElementById("increaseRange"),
+        min: -500,
+        max: 2000
+      }
+    };
+
+    const adjustmentControls = {
+      tradeAmount: {
+        input: document.getElementById("tradeAmount"),
+        range: document.getElementById("tradeAmountRange"),
+        min: 0,
+        max: 5000000
+      },
+      tradePrice: {
+        input: document.getElementById("tradePrice"),
+        range: document.getElementById("tradePriceRange"),
+        min: 1,
+        max: 5000
+      }
+    };
+
+    const whatIfControls = {
+      whatIfAmount: {
+        input: document.getElementById("whatIfAmount"),
+        range: document.getElementById("whatIfAmountRange"),
+        min: 0,
+        max: 10000000
+      },
+      whatIfBuyPrice: {
+        input: document.getElementById("whatIfBuyPrice"),
+        range: document.getElementById("whatIfBuyPriceRange"),
+        min: 1,
+        max: 5000
+      },
+      whatIfTodayPrice: {
+        input: document.getElementById("whatIfTodayPrice"),
+        range: document.getElementById("whatIfTodayPriceRange"),
+        min: 1,
+        max: 5000
+      }
+    };
+
+    const output = {
+      currentValue: document.getElementById("currentValue"),
+      futureValue: document.getElementById("futureValue"),
+      futurePrice: document.getElementById("futurePrice"),
+      gainLoss: document.getElementById("gainLoss"),
+      changeLabel: document.getElementById("changeLabel"),
+      barFill: document.getElementById("barFill"),
+      shell: document.querySelector(".shell"),
+      summaryTop: document.querySelector(".summary-top"),
+      summaryPanel: document.getElementById("summaryPanel"),
+      tradeNote: document.getElementById("tradeNote"),
+      historyList: document.getElementById("historyList"),
+      clearHistory: document.getElementById("clearHistory"),
+      language: document.getElementById("language"),
+      themeToggle: document.getElementById("themeToggle"),
+      settingsOpen: document.getElementById("settingsOpen"),
+      settingsModal: document.getElementById("settingsModal"),
+      settingsClose: document.getElementById("settingsClose"),
+      themeIcon: document.getElementById("themeIcon"),
+      themeLabel: document.querySelector("[data-theme-label]"),
+      educationModal: document.getElementById("educationModal"),
+      educationTitle: document.getElementById("educationTitle"),
+      educationBody: document.getElementById("educationBody"),
+      educationReadMore: document.getElementById("educationReadMore"),
+      educationClose: document.getElementById("educationClose"),
+      whatIfStock: document.getElementById("whatIfStock"),
+      whatIfDate: document.getElementById("whatIfDate"),
+      whatIfShares: document.getElementById("whatIfShares"),
+      whatIfValueToday: document.getElementById("whatIfValueToday"),
+      whatIfGainLoss: document.getElementById("whatIfGainLoss"),
+      whatIfReturn: document.getElementById("whatIfReturn")
+    };
+
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+    const readNumber = (value) => {
+      const normalized = String(value).replace(/[₦,\s]/g, "");
+      return Number.isFinite(Number(normalized)) ? Number(normalized) : 0;
+    };
+    const formatInputNumber = (value, maximumFractionDigits = 0) => readNumber(value).toLocaleString("en-NG", {
+      maximumFractionDigits
+    });
+    const inputDecimals = {
+      shares: 2,
+      price: 0,
+      increase: 0,
+      tradeAmount: 0,
+      tradePrice: 0,
+      whatIfAmount: 0,
+      whatIfBuyPrice: 0,
+      whatIfTodayPrice: 0
+    };
+    const formatShares = (value) => readNumber(value).toLocaleString("en-NG", {
+      maximumFractionDigits: 2
+    });
+    const signedCurrency = (value) => `${value > 0 ? "+" : ""}${formatter.format(value)}`;
+    const signalClasses = ["signal-positive", "signal-negative", "signal-neutral"];
+    const t = (key) => dictionaries[currentLanguage][key] || dictionaries.en[key] || key;
+    let activeEducationTopic = "";
+    const getSignalClass = (value) => {
+      if (value > 0) {
+        return "signal-positive";
+      }
+
+      if (value < 0) {
+        return "signal-negative";
+      }
+
+      return "signal-neutral";
+    };
+
+    function applySignal(element, value) {
+      element.classList.remove(...signalClasses, "gain", "loss");
+      element.classList.add(getSignalClass(value));
+    }
+
+    function initDecorativeIcons() {
+      document.querySelectorAll("svg.icon").forEach((icon) => {
+        icon.setAttribute("aria-hidden", "true");
+        icon.setAttribute("focusable", "false");
+      });
+    }
+
+    function applyLanguage(language) {
+      currentLanguage = dictionaries[language] ? language : "pcm";
+      document.documentElement.lang = currentLanguage;
+      document.title = t("appTitle");
+      output.language.value = currentLanguage;
+
+      try {
+        localStorage.setItem(LANGUAGE_KEY, currentLanguage);
+      } catch {
+      }
+
+      document.querySelectorAll("[data-i18n]").forEach((element) => {
+        element.textContent = t(element.dataset.i18n);
+      });
+
+      document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+        element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+      });
+
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+        element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
+      });
+
+      if (activeEducationTopic) {
+        showEducation(activeEducationTopic);
+      }
+
+      updateThemeButton();
+      renderHistory();
+      calculate();
+      calculateWhatIf();
+    }
+
+    function getEducationTopic(topic) {
+      return dictionaries[currentLanguage].education?.[topic] || dictionaries.en.education[topic];
+    }
+
+    function showEducation(topic) {
+      const item = getEducationTopic(topic);
+
+      if (!item) {
+        return;
+      }
+
+      activeEducationTopic = topic;
+      output.educationTitle.textContent = item.title;
+      output.educationBody.textContent = item.body;
+      output.educationReadMore.href = item.href;
+      output.educationModal.hidden = false;
+      output.educationClose.focus();
+    }
+
+    function closeEducation() {
+      activeEducationTopic = "";
+      output.educationModal.hidden = true;
+    }
+
+    function openSettings() {
+      output.settingsModal.hidden = false;
+      output.language.focus();
+    }
+
+    function closeSettings() {
+      output.settingsModal.hidden = true;
+      output.settingsOpen.focus();
+    }
+
+    function updateThemeButton() {
+      const label = currentTheme === "dark" ? t("lightMode") : t("darkMode");
+      output.themeLabel.textContent = label;
+      output.themeToggle.setAttribute("aria-label", label);
+      output.themeIcon.setAttribute("href", currentTheme === "dark" ? "#icon-sun" : "#icon-moon");
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme === "dark" ? "dark" : "light";
+      document.documentElement.dataset.theme = currentTheme;
+
+      try {
+        localStorage.setItem(THEME_KEY, currentTheme);
+      } catch {
+      }
+
+      updateThemeButton();
+    }
+
+    function setActiveTab(tabName, options = {}) {
+      const activeTab = tabName === "whatIf" ? "whatIf" : "simulator";
+      const shouldSave = options.save !== false;
+
+      document.querySelectorAll("[data-tab-target]").forEach((button) => {
+        const selected = button.dataset.tabTarget === activeTab;
+        button.setAttribute("aria-selected", String(selected));
+        button.tabIndex = selected ? 0 : -1;
+      });
+
+      document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
+        panel.hidden = panel.dataset.tabPanel !== activeTab;
+      });
+
+      const isWhatIf = activeTab === "whatIf";
+      output.shell.classList.toggle("what-if-mode", isWhatIf);
+      output.summaryPanel.hidden = isWhatIf;
+
+      if (shouldSave) {
+        try {
+          localStorage.setItem(ACTIVE_TAB_KEY, activeTab);
+        } catch {
+        }
+      }
+    }
+
+    function setControl(name, value, options = {}) {
+      const shouldSave = options.save !== false;
+      const control = controls[name];
+      const nextValue = clamp(readNumber(value), control.min, control.max);
+      control.input.value = formatInputNumber(nextValue, inputDecimals[name]);
+      control.range.value = nextValue;
+      calculate({ save: shouldSave });
+    }
+
+    function setAdjustmentControl(name, value) {
+      const control = adjustmentControls[name];
+      const nextValue = clamp(readNumber(value), control.min, control.max);
+      control.input.value = formatInputNumber(nextValue, inputDecimals[name]);
+      control.range.value = nextValue;
+    }
+
+    function setWhatIfControl(name, value, options = {}) {
+      const shouldSave = options.save !== false;
+      const control = whatIfControls[name];
+      const nextValue = clamp(readNumber(value), control.min, control.max);
+      control.input.value = formatInputNumber(nextValue, inputDecimals[name]);
+      control.range.value = nextValue;
+      calculateWhatIf();
+
+      if (shouldSave) {
+        writeWhatIfState();
+      }
+    }
+
+    function calculateWhatIf() {
+      const amount = readNumber(whatIfControls.whatIfAmount.input.value);
+      const buyPrice = readNumber(whatIfControls.whatIfBuyPrice.input.value);
+      const todayPrice = readNumber(whatIfControls.whatIfTodayPrice.input.value);
+      const sharesBought = buyPrice > 0 ? amount / buyPrice : 0;
+      const valueToday = sharesBought * todayPrice;
+      const gainLoss = valueToday - amount;
+      const returnPercent = amount > 0 ? gainLoss / amount * 100 : 0;
+
+      output.whatIfShares.textContent = formatShares(sharesBought);
+      output.whatIfValueToday.textContent = formatter.format(valueToday);
+      output.whatIfGainLoss.textContent = signedCurrency(gainLoss);
+      output.whatIfReturn.textContent = `${returnPercent > 0 ? "+" : ""}${returnPercent.toLocaleString("en-NG", {
+        maximumFractionDigits: 2
+      })}%`;
+      applySignal(output.whatIfValueToday, gainLoss);
+      applySignal(output.whatIfGainLoss, gainLoss);
+      applySignal(output.whatIfReturn, gainLoss);
+    }
+
+    function readWhatIfState() {
+      try {
+        return JSON.parse(localStorage.getItem(WHAT_IF_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function writeWhatIfState() {
+      try {
+        localStorage.setItem(WHAT_IF_KEY, JSON.stringify({
+          stock: output.whatIfStock.value,
+          date: output.whatIfDate.value,
+          amount: readNumber(whatIfControls.whatIfAmount.input.value),
+          buyPrice: readNumber(whatIfControls.whatIfBuyPrice.input.value),
+          todayPrice: readNumber(whatIfControls.whatIfTodayPrice.input.value)
+        }));
+      } catch {
+      }
+    }
+
+    function loadWhatIfState() {
+      const savedState = readWhatIfState();
+
+      output.whatIfStock.value = typeof savedState.stock === "string" ? savedState.stock : "";
+      output.whatIfDate.value = typeof savedState.date === "string" ? savedState.date : "";
+
+      if (savedState.amount !== undefined) {
+        setWhatIfControl("whatIfAmount", savedState.amount, { save: false });
+      }
+
+      if (savedState.buyPrice !== undefined) {
+        setWhatIfControl("whatIfBuyPrice", savedState.buyPrice, { save: false });
+      }
+
+      if (savedState.todayPrice !== undefined) {
+        setWhatIfControl("whatIfTodayPrice", savedState.todayPrice, { save: false });
+      }
+
+      calculateWhatIf();
+    }
+
+    function applyMoneyAdjustment(direction) {
+      const amount = readNumber(adjustmentControls.tradeAmount.input.value);
+      const tradePrice = readNumber(adjustmentControls.tradePrice.input.value);
+      const currentShares = readNumber(controls.shares.input.value);
+
+      if (amount <= 0 || tradePrice <= 0) {
+        output.tradeNote.textContent = t("enterAmountFirst");
+        return;
+      }
+
+      const sharesMoved = amount / tradePrice;
+      const signedShares = direction === "buy" ? sharesMoved : -sharesMoved;
+      const nextShares = clamp(currentShares + signedShares, controls.shares.min, controls.shares.max);
+      const actualSharesMoved = Math.abs(nextShares - currentShares);
+      const actualAmount = actualSharesMoved * tradePrice;
+
+      setControl("shares", nextShares, { save: true });
+
+      if (direction === "buy") {
+        output.tradeNote.textContent = t("addedShares")({
+          shares: formatShares(actualSharesMoved),
+          amount: formatter.format(actualAmount),
+          price: formatter.format(tradePrice)
+        });
+        return;
+      }
+
+      output.tradeNote.textContent = t("removedShares")({
+        shares: formatShares(actualSharesMoved),
+        amount: formatter.format(actualAmount),
+        price: formatter.format(tradePrice)
+      });
+    }
+
+    function getCalculation() {
+      const shares = readNumber(controls.shares.input.value);
+      const price = readNumber(controls.price.input.value);
+      const change = readNumber(controls.increase.input.value);
+      const currentValue = shares * price;
+      const futurePrice = Math.max(0, price + change);
+      const futureValue = shares * futurePrice;
+      const gainLoss = futureValue - currentValue;
+
+      return {
+        shares,
+        price,
+        change,
+        currentValue,
+        futurePrice,
+        futureValue,
+        gainLoss
+      };
+    }
+
+    function calculate(options = {}) {
+      const shouldSave = options.save === true;
+      const calculation = getCalculation();
+      const growthMeter = clamp((calculation.change + 500) / 2500 * 100, 0, 100);
+
+      output.currentValue.textContent = formatter.format(calculation.currentValue);
+      output.futureValue.textContent = formatter.format(calculation.futureValue);
+      output.futurePrice.textContent = `${formatter.format(calculation.futurePrice)}/${t("shareUnit")}`;
+      output.gainLoss.textContent = signedCurrency(calculation.gainLoss);
+      output.changeLabel.textContent = `${signedCurrency(calculation.change)}/${t("shareUnit")}`;
+      output.barFill.style.width = `${growthMeter}%`;
+      applySignal(output.summaryTop, calculation.gainLoss);
+      applySignal(output.futurePrice, calculation.change);
+      applySignal(output.gainLoss, calculation.gainLoss);
+      applySignal(output.changeLabel, calculation.change);
+      applySignal(output.barFill, calculation.change);
+
+      if (shouldSave) {
+        scheduleHistorySave(calculation);
+      }
+    }
+
+    function readHistory() {
+      try {
+        return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function writeHistory(items) {
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(items));
+      } catch {
+        return;
+      }
+      renderHistory();
+    }
+
+    function readCollapseState() {
+      try {
+        return JSON.parse(localStorage.getItem(COLLAPSE_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function writeCollapseState(state) {
+      try {
+        localStorage.setItem(COLLAPSE_KEY, JSON.stringify(state));
+      } catch {
+        return;
+      }
+    }
+
+    function setCollapsed(button, collapsed) {
+      const content = document.getElementById(button.dataset.collapseTarget);
+      const icon = button.querySelector(".collapse-icon");
+
+      if (!content) {
+        return;
+      }
+
+      content.hidden = collapsed;
+      button.setAttribute("aria-expanded", String(!collapsed));
+
+      if (icon) {
+        icon.innerHTML = `<svg class="icon" aria-hidden="true" focusable="false"><use href="${collapsed ? "#icon-plus" : "#icon-minus"}"></use></svg>`;
+      }
+    }
+
+    function initCollapsibles() {
+      const savedState = readCollapseState();
+
+      document.querySelectorAll("[data-collapse-target]").forEach((button) => {
+        const target = button.dataset.collapseTarget;
+        const defaultCollapsed = button.dataset.collapseDefault === "closed";
+        const collapsed = typeof savedState[target] === "boolean" ? savedState[target] : defaultCollapsed;
+
+        setCollapsed(button, collapsed);
+
+        button.addEventListener("click", () => {
+          const nextCollapsed = button.getAttribute("aria-expanded") === "true";
+          const nextState = readCollapseState();
+          nextState[target] = nextCollapsed;
+          writeCollapseState(nextState);
+          setCollapsed(button, nextCollapsed);
+        });
+      });
+    }
+
+    function saveHistoryItem(calculation) {
+      if (calculation.shares <= 0) {
+        renderHistory();
+        return;
+      }
+
+      const existing = readHistory();
+      const item = {
+        ...calculation,
+        savedAt: Date.now()
+      };
+      const next = [
+        item,
+        ...existing.filter((entry) => (
+          entry.shares !== calculation.shares ||
+          entry.price !== calculation.price ||
+          entry.change !== calculation.change
+        ))
+      ].slice(0, MAX_HISTORY_ITEMS);
+
+      writeHistory(next);
+    }
+
+    function scheduleHistorySave(calculation) {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveHistoryItem(calculation), 350);
+    }
+
+    function renderHistory() {
+      const storedItems = readHistory();
+      const items = storedItems.filter((item) => readNumber(item.shares) > 0);
+
+      if (items.length !== storedItems.length) {
+        writeHistory(items);
+        return;
+      }
+
+      output.clearHistory.hidden = items.length === 0;
+      output.historyList.textContent = "";
+
+      if (items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty-history";
+        empty.textContent = t("emptyHistory");
+        output.historyList.append(empty);
+        return;
+      }
+
+      items.forEach((item, index) => {
+        const safeItem = {
+          shares: readNumber(item.shares),
+          price: readNumber(item.price),
+          change: readNumber(item.change),
+          futureValue: readNumber(item.futureValue),
+          futurePrice: readNumber(item.futurePrice),
+          gainLoss: readNumber(item.gainLoss)
+        };
+        const button = document.createElement("button");
+        const textWrap = document.createElement("span");
+        const main = document.createElement("span");
+        const meta = document.createElement("span");
+        const gain = document.createElement("span");
+
+        button.type = "button";
+        button.className = "history-item";
+        button.dataset.historyIndex = index;
+        main.className = "history-main";
+        meta.className = "history-meta";
+        gain.className = `history-gain ${getSignalClass(safeItem.gainLoss)}`;
+        main.textContent = t("historyMain")({
+          shares: formatShares(safeItem.shares),
+          price: formatter.format(safeItem.price),
+          futureValue: formatter.format(safeItem.futureValue)
+        });
+        meta.textContent = t("historyMeta")({
+          change: signedCurrency(safeItem.change),
+          futurePrice: formatter.format(safeItem.futurePrice)
+        });
+        gain.textContent = signedCurrency(safeItem.gainLoss);
+
+        textWrap.append(main, meta);
+        button.append(textWrap, gain);
+        output.historyList.append(button);
+      });
+    }
+
+    function loadHistoryItem(index) {
+      const item = readHistory()[index];
+      if (!item) {
+        return;
+      }
+
+      setControl("shares", item.shares, { save: false });
+      setControl("price", item.price, { save: false });
+      setControl("increase", item.change, { save: false });
+      saveHistoryItem(getCalculation());
+    }
+
+    Object.entries(controls).forEach(([name, control]) => {
+      control.input.addEventListener("input", (event) => setControl(name, event.target.value, { save: true }));
+      control.range.addEventListener("input", (event) => setControl(name, event.target.value, { save: true }));
+    });
+
+    Object.entries(adjustmentControls).forEach(([name, control]) => {
+      control.input.addEventListener("input", (event) => setAdjustmentControl(name, event.target.value));
+      control.range.addEventListener("input", (event) => setAdjustmentControl(name, event.target.value));
+    });
+
+    Object.entries(whatIfControls).forEach(([name, control]) => {
+      control.input.addEventListener("input", (event) => setWhatIfControl(name, event.target.value));
+      control.range.addEventListener("input", (event) => setWhatIfControl(name, event.target.value));
+    });
+
+    document.querySelectorAll("[data-tab-target]").forEach((button) => {
+      button.addEventListener("click", () => setActiveTab(button.dataset.tabTarget));
+      button.addEventListener("keydown", (event) => {
+        if (!["ArrowLeft", "ArrowRight"].includes(event.key)) {
+          return;
+        }
+
+        const tabs = [...document.querySelectorAll("[data-tab-target]")];
+        const currentIndex = tabs.indexOf(button);
+        const direction = event.key === "ArrowRight" ? 1 : -1;
+        const nextTab = tabs[(currentIndex + direction + tabs.length) % tabs.length];
+
+        event.preventDefault();
+        nextTab.focus();
+        setActiveTab(nextTab.dataset.tabTarget);
+      });
+    });
+
+    document.querySelectorAll("[data-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const name = button.dataset.target;
+        const delta = readNumber(button.dataset.delta);
+        setControl(name, readNumber(controls[name].input.value) + delta, { save: true });
+      });
+    });
+
+    document.querySelectorAll("[data-adjust-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const name = button.dataset.adjustTarget;
+        const delta = readNumber(button.dataset.adjustDelta);
+        setAdjustmentControl(name, readNumber(adjustmentControls[name].input.value) + delta);
+      });
+    });
+
+    document.querySelectorAll("[data-whatif-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const name = button.dataset.whatifTarget;
+        const delta = readNumber(button.dataset.whatifDelta);
+        setWhatIfControl(name, readNumber(whatIfControls[name].input.value) + delta);
+      });
+    });
+
+    document.querySelectorAll("[data-preset]").forEach((button) => {
+      button.addEventListener("click", () => setControl("increase", button.dataset.preset, { save: true }));
+    });
+
+    document.getElementById("addMoney").addEventListener("click", () => applyMoneyAdjustment("buy"));
+    document.getElementById("removeMoney").addEventListener("click", () => applyMoneyAdjustment("sell"));
+    output.whatIfStock.addEventListener("input", writeWhatIfState);
+    output.whatIfDate.addEventListener("input", writeWhatIfState);
+    output.language.addEventListener("change", (event) => applyLanguage(event.target.value));
+    output.themeToggle.addEventListener("click", () => applyTheme(currentTheme === "dark" ? "light" : "dark"));
+    output.settingsOpen.addEventListener("click", openSettings);
+    output.settingsClose.addEventListener("click", closeSettings);
+    output.settingsModal.addEventListener("click", (event) => {
+      if (event.target === output.settingsModal) {
+        closeSettings();
+      }
+    });
+    output.educationClose.addEventListener("click", closeEducation);
+    output.educationModal.addEventListener("click", (event) => {
+      if (event.target === output.educationModal) {
+        closeEducation();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !output.settingsModal.hidden) {
+        closeSettings();
+        return;
+      }
+
+      if (event.key === "Escape" && !output.educationModal.hidden) {
+        closeEducation();
+      }
+    });
+
+    document.querySelectorAll("[data-education-topic]").forEach((button) => {
+      button.addEventListener("click", () => showEducation(button.dataset.educationTopic));
+    });
+
+    output.historyList.addEventListener("click", (event) => {
+      const item = event.target.closest("[data-history-index]");
+      if (item) {
+        loadHistoryItem(readNumber(item.dataset.historyIndex));
+      }
+    });
+
+    output.clearHistory.addEventListener("click", () => {
+      try {
+        localStorage.removeItem(HISTORY_KEY);
+      } catch {
+        return;
+      }
+      renderHistory();
+    });
+
+    initDecorativeIcons();
+    initCollapsibles();
+    loadWhatIfState();
+
+    try {
+      setActiveTab(localStorage.getItem(ACTIVE_TAB_KEY), { save: false });
+    } catch {
+      setActiveTab("simulator", { save: false });
+    }
+
+    try {
+      currentTheme = localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
+    } catch {
+      currentTheme = "light";
+    }
+
+    try {
+      currentLanguage = dictionaries[localStorage.getItem(LANGUAGE_KEY)] ? localStorage.getItem(LANGUAGE_KEY) : "pcm";
+    } catch {
+      currentLanguage = "pcm";
+    }
+
+    applyTheme(currentTheme);
+    applyLanguage(currentLanguage);
+  </script>
+</body>
+</html>
