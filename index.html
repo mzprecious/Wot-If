@@ -17,7 +17,7 @@
        \_____|________|________|________/
 
   Omo dev, you don open source. Welcome.
-  This small calculator na for Nigerians wey wan understand shares,
+  Wot If? na small calculator for Nigerians wey wan understand shares,
   price movement, and "what if I invested?" without too much cho cho cho.
 
   No be financial advice. Use your head, ask questions, verify numbers.
@@ -30,7 +30,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Share Growth Simulator</title>
+  <title>Wot If?</title>
   <style>
     :root {
       color-scheme: light;
@@ -234,6 +234,35 @@
     .settings-fields .theme-toggle {
       width: 100%;
       height: 44px;
+    }
+
+    .welcome-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .language-choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .language-choice {
+      min-height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-size: 0.95rem;
+      font-weight: 850;
+    }
+
+    html[data-theme="dark"] .language-choice {
+      background: #203128;
+      border-color: #40554a;
+      color: #dff8ed;
     }
 
     .tab-switcher {
@@ -1493,7 +1522,7 @@
   <main>
     <header>
       <div>
-        <h1 data-i18n="appTitle">Stock Calculator</h1>
+        <h1 data-i18n="appTitle">Wot If?</h1>
         <p class="subtitle" data-i18n="subtitle">Simulate market positions.</p>
       </div>
       <div class="header-actions">
@@ -1772,12 +1801,12 @@
       <div>
         <strong class="footer-title" data-i18n="footerTitle">Investor education</strong>
         <p data-i18n="disclaimer">This calculator is for education only and is not financial advice.</p>
-        <div class="copyright" data-i18n="copyright">Copyright 2026 Made with ❤️ in Nigeria</div>
+        <div class="copyright" data-i18n="copyright">Wot If? Copyright 2026 Made with ❤️ in Abuja</div>
         <a class="creator-link" href="https://x.com/0x0bytez" target="_blank" rel="noopener">
           <svg class="icon"><use href="#icon-x-logo"></use></svg>
           <span data-i18n="creatorLink">Follow 0x0bytez</span>
         </a>
-        <a class="creator-link" href="https://x.com/intent/tweet?text=@0x0bytez%20I%20tried%20your%20Nigerian%20stock%20calculator%20and%20" target="_blank" rel="noopener">
+        <a class="creator-link" href="https://x.com/intent/tweet?text=@0x0bytez%20I%20tried%20Wot%20If%3F%20and%20" target="_blank" rel="noopener">
           <svg class="icon"><use href="#icon-x-logo"></use></svg>
           <span data-i18n="replyOnX">Reply on X</span>
         </a>
@@ -1839,6 +1868,25 @@
         </div>
       </div>
     </div>
+
+    <div class="education-modal" id="welcomeModal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 class="modal-title" id="welcomeTitle" data-i18n="welcomeTitle">Choose your language</h2>
+          <button type="button" class="modal-close icon-button" id="welcomeClose" aria-label="Keep Pidgin" data-i18n-aria-label="keepPidgin"><svg class="icon"><use href="#icon-x"></use></svg></button>
+        </div>
+        <div class="modal-body">
+          <p class="welcome-copy"><strong>Wot If?</strong> <span data-i18n="welcomeCopyRest">starts in Pidgin, but you can choose the language that is easiest for you.</span></p>
+          <div class="language-choice-grid" aria-label="Choose language" data-i18n-aria-label="chooseLanguage">
+            <button type="button" class="language-choice" data-language-choice="pcm">Pidgin</button>
+            <button type="button" class="language-choice" data-language-choice="en">English</button>
+            <button type="button" class="language-choice" data-language-choice="yo">Yoruba</button>
+            <button type="button" class="language-choice" data-language-choice="ha">Hausa</button>
+            <button type="button" class="language-choice" data-language-choice="ig">Igbo</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script>
@@ -1851,6 +1899,7 @@
     const HISTORY_KEY = "share-growth-simulator:recent-naira-calculations";
     const COLLAPSE_KEY = "share-growth-simulator:collapsed-sections";
     const LANGUAGE_KEY = "share-growth-simulator:language";
+    const WELCOME_KEY = "share-growth-simulator:welcome-language-seen";
     const THEME_KEY = "share-growth-simulator:theme";
     const WHAT_IF_KEY = "share-growth-simulator:what-if";
     const ACTIVE_TAB_KEY = "share-growth-simulator:active-tab";
@@ -1858,15 +1907,20 @@
     let saveTimer;
     let currentLanguage = "pcm";
     let currentTheme = "light";
+    let hasStoredLanguage = false;
 
     const dictionaries = {
       en: {
-        appTitle: "Stock Calculator",
+        appTitle: "Wot If?",
         subtitle: "Simulate market positions.",
         language: "Language",
         moreSettings: "More settings",
         settingsTitle: "Settings",
         closeSettings: "Close settings",
+        welcomeTitle: "Choose your language",
+        welcomeCopyRest: "starts in Pidgin, but you can choose the language that is easiest for you.",
+        keepPidgin: "Keep Pidgin",
+        chooseLanguage: "Choose language",
         calculatorMode: "Calculator mode",
         simulatorTab: "My shares",
         whatIfTab: "What if I invested?",
@@ -1911,7 +1965,7 @@
         growthMeter: "Growth meter",
         footerTitle: "Investor education",
         disclaimer: "This calculator is for education only and is not financial advice.",
-        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
         creatorLink: "Follow 0x0bytez",
         replyOnX: "Reply on X",
         educationLinks: "Investor education links",
@@ -1950,7 +2004,7 @@
           },
           sec: {
             title: "What is Nigeria SEC?",
-            body: "Nigeria SEC is like the market referee. Its job is to set rules for the capital market and help protect investors. For example, when companies, brokers, or investment products operate in Nigeria, SEC oversight helps make sure they follow the rules.",
+            body: "Nigeria SEC is like the market referee. Its job is to set rules for the capital market and help protect investors. For example, when companies, brokers, or investment products operate in Abuja, SEC oversight helps make sure they follow the rules.",
             href: "https://web.archive.org/web/20150411103419/http://www.sec.gov.ng/what-we-do.html"
           },
           stock: {
@@ -1960,7 +2014,7 @@
           },
           ipo: {
             title: "What is an IPO?",
-            body: "An IPO is like when a family business that only family members owned before now opens the gate for the public to buy small parts of it. In Nigeria, that can mean the company lists on an exchange so everyday investors can buy shares. It does not mean the price must go up. It only means the public can now join as owners.",
+            body: "An IPO is like when a family business that only family members owned before now opens the gate for the public to buy small parts of it. in Abuja, that can mean the company lists on an exchange so everyday investors can buy shares. It does not mean the price must go up. It only means the public can now join as owners.",
             href: "https://web.archive.org/web/*/https://www.investopedia.com/terms/i/ipo.asp"
           }
         },
@@ -1973,12 +2027,16 @@
         historyMeta: ({ change, futurePrice }) => `${change}/share change, ${futurePrice}/share`
       },
       pcm: {
-        appTitle: "Stock Calculator",
+        appTitle: "Wot If?",
         subtitle: "Check how your market position fit move.",
         language: "Language",
         moreSettings: "More settings",
         settingsTitle: "Settings",
         closeSettings: "Close settings",
+        welcomeTitle: "Choose your language",
+        welcomeCopyRest: "dey start with Pidgin, but choose the language wey easy pass for you.",
+        keepPidgin: "Keep Pidgin",
+        chooseLanguage: "Choose language",
         calculatorMode: "Calculator mode",
         simulatorTab: "My shares",
         whatIfTab: "What if I invest?",
@@ -2023,7 +2081,7 @@
         growthMeter: "Growth meter",
         footerTitle: "Investor education",
         disclaimer: "This calculator na for learning only; e no be financial advice.",
-        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
         creatorLink: "Follow 0x0bytez",
         replyOnX: "Reply on X",
         educationLinks: "Investor education links",
@@ -2085,12 +2143,16 @@
         historyMeta: ({ change, futurePrice }) => `${change}/share change, ${futurePrice}/share`
       },
       yo: {
-        appTitle: "Kalikuleto Oja Ipin",
+        appTitle: "Wot If?",
         subtitle: "Se afiwe ipo idoko-owo ninu oja.",
         language: "Ede",
         moreSettings: "Awon eto miran",
         settingsTitle: "Eto",
         closeSettings: "Pa eto",
+        welcomeTitle: "Yan ede re",
+        welcomeCopyRest: "maa n bere pelu Pidgin, sugbon yan ede ti o rorun ju fun e.",
+        keepPidgin: "Lo Pidgin",
+        chooseLanguage: "Yan ede",
         calculatorMode: "Ipo kalikuleto",
         simulatorTab: "Awon ipin mi",
         whatIfTab: "Bi mo ba se idokoowo?",
@@ -2135,7 +2197,7 @@
         growthMeter: "Mita idagbasoke",
         footerTitle: "Eko fun oludokoowo",
         disclaimer: "Kalikuleto yi wa fun eko nikan; kii se imoran owo.",
-        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
         creatorLink: "Tele 0x0bytez",
         replyOnX: "Fi reply ranse lori X",
         educationLinks: "Awon linki eko fun oludokoowo",
@@ -2197,12 +2259,16 @@
         historyMeta: ({ change, futurePrice }) => `${change}/ipin iyipada, ${futurePrice}/ipin`
       },
       ha: {
-        appTitle: "Kalkuletan Hannun Jari",
+        appTitle: "Wot If?",
         subtitle: "Kwaikwayi matsayin kasuwa.",
         language: "Harshe",
         moreSettings: "Karin saituna",
         settingsTitle: "Saituna",
         closeSettings: "Rufe saituna",
+        welcomeTitle: "Zabi harshe",
+        welcomeCopyRest: "na farawa da Pidgin, amma zabi harshen da ya fi maka sauki.",
+        keepPidgin: "Ci gaba da Pidgin",
+        chooseLanguage: "Zabi harshe",
         calculatorMode: "Yanayin kalkuleta",
         simulatorTab: "Hannuna",
         whatIfTab: "Idan na zuba jari fa?",
@@ -2247,7 +2313,7 @@
         growthMeter: "Mizanin girma",
         footerTitle: "Ilimin masu zuba jari",
         disclaimer: "Wannan kalkuleta na ilimi ne kawai; ba shawarar kudi ba ce.",
-        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
         creatorLink: "Bi 0x0bytez",
         replyOnX: "Amsa a X",
         educationLinks: "Hanyoyin ilimin masu zuba jari",
@@ -2309,12 +2375,16 @@
         historyMeta: ({ change, futurePrice }) => `${change}/hannu canji, ${futurePrice}/hannu`
       },
       ig: {
-        appTitle: "Kalkuletọ Akụkụ Ahịa",
+        appTitle: "Wot If?",
         subtitle: "Mee nnwale ọnọdụ ahịa.",
         language: "Asụsụ",
         moreSettings: "Ntọala ndị ọzọ",
         settingsTitle: "Ntọala",
         closeSettings: "Mechie ntọala",
+        welcomeTitle: "Họrọ asụsụ gị",
+        welcomeCopyRest: "na-amalite na Pidgin, mana họrọ asụsụ kacha dịrị gị mfe.",
+        keepPidgin: "Jiri Pidgin gaa n'ihu",
+        chooseLanguage: "Họrọ asụsụ",
         calculatorMode: "Ụdị kalkuletọ",
         simulatorTab: "Akụkụ m",
         whatIfTab: "Ọ bụrụ na m tinyere ego?",
@@ -2359,7 +2429,7 @@
         growthMeter: "Mita uto",
         footerTitle: "Mmụta maka itinye ego",
         disclaimer: "Kalkuletọ a bu maka mmụta naanị; ọ bụghị ndụmọdụ ego.",
-        copyright: "Copyright 2026 Made with ❤️ in Nigeria",
+        copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
         creatorLink: "Soro 0x0bytez",
         replyOnX: "Zaghachi na X",
         educationLinks: "Njikọ mmụta maka itinye ego",
@@ -2497,6 +2567,8 @@
       settingsOpen: document.getElementById("settingsOpen"),
       settingsModal: document.getElementById("settingsModal"),
       settingsClose: document.getElementById("settingsClose"),
+      welcomeModal: document.getElementById("welcomeModal"),
+      welcomeClose: document.getElementById("welcomeClose"),
       themeIcon: document.getElementById("themeIcon"),
       themeLabel: document.querySelector("[data-theme-label]"),
       educationModal: document.getElementById("educationModal"),
@@ -2626,6 +2698,36 @@
     function closeSettings() {
       output.settingsModal.hidden = true;
       output.settingsOpen.focus();
+    }
+
+    function markWelcomeSeen() {
+      try {
+        localStorage.setItem(WELCOME_KEY, "true");
+      } catch {
+      }
+    }
+
+    function closeWelcome() {
+      markWelcomeSeen();
+      output.welcomeModal.hidden = true;
+    }
+
+    function chooseWelcomeLanguage(language) {
+      applyLanguage(language);
+      closeWelcome();
+    }
+
+    function maybeShowWelcome() {
+      try {
+        if (localStorage.getItem(WELCOME_KEY) === "true" || hasStoredLanguage) {
+          return;
+        }
+      } catch {
+        return;
+      }
+
+      output.welcomeModal.hidden = false;
+      output.welcomeModal.querySelector("[data-language-choice='pcm']").focus();
     }
 
     function updateThemeButton() {
@@ -3081,6 +3183,12 @@
         closeSettings();
       }
     });
+    output.welcomeClose.addEventListener("click", closeWelcome);
+    output.welcomeModal.addEventListener("click", (event) => {
+      if (event.target === output.welcomeModal) {
+        closeWelcome();
+      }
+    });
     output.educationClose.addEventListener("click", closeEducation);
     output.educationModal.addEventListener("click", (event) => {
       if (event.target === output.educationModal) {
@@ -3088,6 +3196,11 @@
       }
     });
     document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !output.welcomeModal.hidden) {
+        closeWelcome();
+        return;
+      }
+
       if (event.key === "Escape" && !output.settingsModal.hidden) {
         closeSettings();
         return;
@@ -3100,6 +3213,10 @@
 
     document.querySelectorAll("[data-education-topic]").forEach((button) => {
       button.addEventListener("click", () => showEducation(button.dataset.educationTopic));
+    });
+
+    document.querySelectorAll("[data-language-choice]").forEach((button) => {
+      button.addEventListener("click", () => chooseWelcomeLanguage(button.dataset.languageChoice));
     });
 
     output.historyList.addEventListener("click", (event) => {
@@ -3135,13 +3252,17 @@
     }
 
     try {
-      currentLanguage = dictionaries[localStorage.getItem(LANGUAGE_KEY)] ? localStorage.getItem(LANGUAGE_KEY) : "pcm";
+      const storedLanguage = localStorage.getItem(LANGUAGE_KEY);
+      hasStoredLanguage = Boolean(dictionaries[storedLanguage]);
+      currentLanguage = hasStoredLanguage ? storedLanguage : "pcm";
     } catch {
       currentLanguage = "pcm";
+      hasStoredLanguage = false;
     }
 
     applyTheme(currentTheme);
     applyLanguage(currentLanguage);
+    maybeShowWelcome();
   </script>
 </body>
 </html>
