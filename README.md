@@ -19,6 +19,14 @@
 
 <img src="assets/screen_1.png" width=300px>
 
+## Brand Assets
+
+- `assets/logo.svg` - Wot If? wordmark for profile links, docs, and sharing
+- `assets/icon.svg` - app icon and browser favicon
+- `assets/social-card.svg` - Open Graph and X/Twitter preview card
+
+For production social previews, use a deployed absolute HTTPS URL for `og:image` and `twitter:image`. Some platforms may prefer a PNG or JPG export of the social card.
+
 ## Roadmap
 [x] Alpha
 [ ] Add 3rd-party API for NGX stocks historical data

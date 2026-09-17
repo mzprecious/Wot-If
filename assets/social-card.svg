@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Wot If? social card</title>
+  <desc id="desc">Social preview card for Wot If?, a Nigerian share calculator.</desc>
+  <rect width="1200" height="630" fill="#101713"/>
+  <rect x="56" y="56" width="1088" height="518" rx="44" fill="#17211c" stroke="#314139" stroke-width="4"/>
+  <rect x="104" y="104" width="178" height="178" rx="36" fill="#117a5d"/>
+  <text x="190" y="217" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="112" font-weight="900" text-anchor="middle">₦</text>
+  <text x="244" y="224" fill="#f1c84b" font-family="Inter, Arial, sans-serif" font-size="96" font-weight="900" text-anchor="middle">?</text>
+  <circle cx="245" cy="250" r="7" fill="#f1c84b"/>
+  <text x="326" y="215" fill="#edf3ee" font-family="Inter, Arial, sans-serif" font-size="100" font-weight="900">Wot If?</text>
+  <text x="104" y="426" fill="#edf3ee" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="850">You dey fear but what if?</text>
+  <text x="104" y="526" fill="#f1c84b" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800">Built for learning. Not financial advice.</text>
+</svg>

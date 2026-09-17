@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" role="img" aria-labelledby="title desc">
+  <title id="title">Wot If? logo</title>
+  <desc id="desc">Green and yellow Wot If? wordmark with a naira question mark logo.</desc>
+  <rect width="720" height="220" rx="36" fill="#f6f4ef"/>
+  <rect x="28" y="28" width="164" height="164" rx="32" fill="#117a5d"/>
+  <text x="110" y="129" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="92" font-weight="900" text-anchor="middle">₦</text>
+  <text x="150" y="136" fill="#f1c84b" font-family="Inter, Arial, sans-serif" font-size="78" font-weight="900" text-anchor="middle">?</text>
+  <circle cx="151" cy="160" r="6" fill="#f1c84b"/>
+  <text x="220" y="120" fill="#17201b" font-family="Inter, Arial, sans-serif" font-size="76" font-weight="900" letter-spacing="0">Wot If?</text>
+  <text x="224" y="158" fill="#647069" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">You dey fear what if?</text>
+</svg>
