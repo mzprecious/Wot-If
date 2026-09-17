@@ -20,7 +20,7 @@
 <img src="assets/screen_1.png" width=300px>
 
 ## Roadmap
-[ ] Alpha
+[x] Alpha
 [ ] Add 3rd-party API for NGX stocks historical data
 
 ## Notes
