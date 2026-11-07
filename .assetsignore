@@ -1,0 +1,11 @@
+.DS_Store
+.assetsignore
+.git/**
+.github/**
+.wrangler/**
+workers/**
+node_modules/**
+wrangler.toml
+README.md
+LICENSE
+.gitignore

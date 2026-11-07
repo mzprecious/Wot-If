@@ -29,7 +29,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Wot If?</title>
   <meta name="description" content="Wot If? is a Nigerian share calculator for checking shares, naira value, and what-if returns.">
   <meta property="og:title" content="Wot If?">
@@ -93,24 +93,32 @@
       box-sizing: border-box;
     }
 
+    html,
+    body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
+      min-height: 100dvh;
       background: var(--paper);
       color: var(--ink);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-text-size-adjust: 100%;
     }
 
     main {
-      width: min(1120px, calc(100% - 32px));
+      width: min(100% - 12px, 640px);
       margin: 0 auto;
-      padding: 32px 0;
+      padding: max(8px, env(safe-area-inset-top)) 0 max(8px, env(safe-area-inset-bottom));
     }
 
     .shell {
       display: grid;
-      grid-template-columns: minmax(0, 1.06fr) minmax(320px, 0.94fr);
-      gap: 18px;
+      grid-template-columns: 1fr;
+      gap: 8px;
       align-items: start;
     }
 
@@ -127,21 +135,20 @@
     }
 
     .workspace {
-      padding: 22px;
+      padding: 8px;
     }
 
     .summary {
-      position: sticky;
-      top: 24px;
+      position: static;
       overflow: hidden;
     }
 
     header {
       display: flex;
       justify-content: space-between;
-      gap: 18px;
+      gap: 10px;
       align-items: flex-start;
-      margin-bottom: 22px;
+      margin-bottom: 10px;
     }
 
     .header-actions {
@@ -153,17 +160,17 @@
     h1 {
       margin: 0;
       max-width: 680px;
-      font-size: clamp(2rem, 4vw, 4rem);
-      line-height: 0.98;
+      font-size: 2rem;
+      line-height: 1.04;
       letter-spacing: 0;
     }
 
     .subtitle {
       max-width: 520px;
-      margin: 12px 0 0;
+      margin: 6px 0 0;
       color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.55;
+      font-size: 0.9rem;
+      line-height: 1.35;
     }
 
     .currency-pill {
@@ -223,8 +230,8 @@
     }
 
     .more-button {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       display: inline-grid;
       place-items: center;
       border: 1px solid var(--line);
@@ -275,17 +282,32 @@
       font-weight: 850;
     }
 
+    .language-choice[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
     html[data-theme="dark"] .language-choice {
       background: #203128;
       border-color: #40554a;
       color: #dff8ed;
     }
 
+    html[data-theme="dark"] .language-choice[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #07110c;
+    }
+
     .tab-switcher {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 6px;
-      margin-bottom: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      margin-bottom: 8px;
       padding: 5px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -298,12 +320,13 @@
     }
 
     .tab-button {
-      min-height: 46px;
+      min-height: 52px;
       border: 1px solid transparent;
       border-radius: 7px;
       background: transparent;
       color: var(--muted);
-      font-size: 0.95rem;
+      padding: 0 8px;
+      font-size: 0.92rem;
       font-weight: 820;
       line-height: 1.2;
       transition: background 160ms ease-out, color 160ms ease-out, border-color 160ms ease-out, transform 120ms ease-out;
@@ -338,19 +361,19 @@
     .panel-heading {
       margin: 0 0 10px;
       color: var(--ink);
-      font-size: 1.15rem;
+      font-size: 1rem;
       line-height: 1.2;
     }
 
     .controls {
       display: grid;
-      gap: 16px;
+      gap: 8px;
     }
 
     .control {
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 18px;
+      padding: 12px;
       background: #fbfcfa;
     }
 
@@ -438,15 +461,16 @@
     }
 
     .collapsible-content {
-      padding-top: 14px;
+      padding-top: 10px;
     }
 
     .control-top {
       display: flex;
       justify-content: space-between;
-      gap: 16px;
+      flex-direction: column;
+      gap: 10px;
       align-items: flex-start;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .label-group {
@@ -456,21 +480,22 @@
     label {
       display: block;
       color: var(--ink);
-      font-size: 0.98rem;
+      font-size: 0.94rem;
       font-weight: 760;
     }
 
     .hint {
       margin-top: 4px;
       color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.35;
+      font-size: 0.8rem;
+      line-height: 1.3;
     }
 
     .stepper {
       display: grid;
-      grid-template-columns: 38px minmax(112px, 150px) 38px;
-      height: 40px;
+      grid-template-columns: 44px minmax(0, 1fr) 44px;
+      width: 100%;
+      height: 38px;
       border: 1px solid var(--line);
       border-radius: 8px;
       overflow: hidden;
@@ -558,6 +583,7 @@
       color: var(--ink);
       background: #fff;
       font: inherit;
+      font-size: 16px;
       font-weight: 760;
       text-align: center;
       outline: 0;
@@ -570,13 +596,14 @@
 
     input[type="date"] {
       font: inherit;
+      font-size: 16px;
     }
 
     .field-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 14px;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .field {
@@ -585,7 +612,7 @@
     }
 
     .field-input {
-      height: 40px;
+      height: 38px;
       border: 1px solid var(--line) !important;
       border-radius: 8px;
       padding: 0 12px !important;
@@ -593,6 +620,7 @@
       color: var(--ink);
       text-align: left !important;
       font-weight: 720;
+      font-size: 16px;
     }
 
     html[data-theme="dark"] .field-input {
@@ -653,8 +681,8 @@
 
     .future-value {
       margin: 0;
-      font-size: clamp(2.35rem, 7vw, 4.5rem);
-      line-height: 0.95;
+      font-size: clamp(2.05rem, 11vw, 3rem);
+      line-height: 1;
       font-weight: 850;
       letter-spacing: 0;
       overflow-wrap: anywhere;
@@ -836,6 +864,60 @@
       font-weight: 850;
       line-height: 1.15;
       overflow-wrap: anywhere;
+    }
+
+    .api-helper {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+      margin-bottom: 16px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--accent-soft);
+    }
+
+    .api-helper .field-grid {
+      margin-bottom: 0;
+    }
+
+    .api-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .api-button {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 820;
+      cursor: pointer;
+    }
+
+    .api-button:disabled {
+      border-color: var(--line);
+      background: var(--line);
+      color: var(--muted);
+      cursor: wait;
+    }
+
+    .api-status {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.35;
     }
 
     .history {
@@ -1135,10 +1217,40 @@
       line-height: 1.55;
     }
 
+    .modal-lines {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .modal-lines p {
+      margin: 0;
+    }
+
     .modal-link {
       width: fit-content;
       margin-top: 14px;
       padding-inline: 12px;
+    }
+
+    .modal-cta {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 16px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 850;
+    }
+
+    html[data-theme="dark"] .modal-cta,
+    html[data-theme="dark"] .modal-cta:hover {
+      background: var(--accent);
+      color: #07110c;
     }
 
     .copyright {
@@ -1166,6 +1278,116 @@
       text-underline-offset: 3px;
     }
 
+    @media (min-width: 821px) {
+      main {
+        width: min(1120px, calc(100% - 32px));
+        padding: 32px 0;
+      }
+
+      .shell {
+        grid-template-columns: minmax(0, 1.06fr) minmax(320px, 0.94fr);
+        gap: 18px;
+      }
+
+      .shell.what-if-mode {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .workspace {
+        padding: 22px;
+      }
+
+      .summary {
+        order: initial;
+        position: sticky;
+        top: 24px;
+      }
+
+      header {
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 4vw, 4rem);
+        line-height: 0.98;
+      }
+
+      .subtitle {
+        margin-top: 12px;
+        font-size: 1rem;
+        line-height: 1.55;
+      }
+
+      .future-value {
+        font-size: clamp(2.35rem, 7vw, 4.5rem);
+        line-height: 0.95;
+      }
+
+      .more-button {
+        width: 44px;
+        height: 44px;
+      }
+
+      .tab-switcher {
+        position: static;
+        margin-bottom: 16px;
+      }
+
+      .tab-button {
+        min-height: 46px;
+        padding: 0;
+        font-size: 0.95rem;
+      }
+
+      .panel-heading {
+        font-size: 1.15rem;
+      }
+
+      .controls {
+        gap: 16px;
+      }
+
+      .control {
+        padding: 18px;
+      }
+
+      .field-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .collapsible-content {
+        padding-top: 14px;
+      }
+
+      .control-top {
+        flex-direction: row;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      label {
+        font-size: 0.98rem;
+      }
+
+      .hint {
+        font-size: 0.88rem;
+        line-height: 1.35;
+      }
+
+      .stepper {
+        width: auto;
+        height: 40px;
+        grid-template-columns: 38px minmax(112px, 150px) 38px;
+      }
+
+      .field-input {
+        height: 40px;
+      }
+    }
+
     @media (max-width: 820px) {
       main {
         width: min(100% - 12px, 640px);
@@ -1175,10 +1397,6 @@
       .shell {
         grid-template-columns: 1fr;
         gap: 8px;
-      }
-
-      .summary {
-        order: -1;
       }
 
       .summary {
@@ -1371,7 +1589,7 @@
       }
 
       .future-value {
-        font-size: 2.5rem;
+        font-size: clamp(2rem, 10vw, 2.75rem);
       }
 
       .summary-body {
@@ -1534,6 +1752,11 @@
       <path d="M4 4l16 16"></path>
       <path d="M20 4 4 20"></path>
     </symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 11v6"></path>
+      <path d="M12 7h.01"></path>
+    </symbol>
   </svg>
   <main>
     <header>
@@ -1542,6 +1765,7 @@
         <p class="subtitle" data-i18n="subtitle">Simulate market positions.</p>
       </div>
       <div class="header-actions">
+        <button type="button" class="more-button icon-button" id="aboutOpen" aria-label="About Wot If?" data-i18n-aria-label="aboutOpen"><svg class="icon"><use href="#icon-info"></use></svg></button>
         <button type="button" class="more-button icon-button" id="settingsOpen" aria-label="More settings" data-i18n-aria-label="moreSettings"><svg class="icon"><use href="#icon-more"></use></svg></button>
       </div>
     </header>
@@ -1605,20 +1829,21 @@
             <div class="collapsible-content" id="projectionContent">
               <div class="control-top">
                 <div class="stepper">
-                  <button type="button" data-target="increase" data-delta="-25" aria-label="Decrease projected change" data-i18n-aria-label="decreaseProjectedChange"><svg class="icon"><use href="#icon-minus"></use></svg></button>
-                  <input id="increase" type="text" inputmode="numeric" value="25">
-                  <button type="button" data-target="increase" data-delta="25" aria-label="Increase projected change" data-i18n-aria-label="increaseProjectedChange"><svg class="icon"><use href="#icon-plus"></use></svg></button>
+                  <button type="button" data-target="increase" data-delta="-1" aria-label="Decrease projected percentage change" data-i18n-aria-label="decreaseProjectedChange"><svg class="icon"><use href="#icon-minus"></use></svg></button>
+                  <input id="increase" type="text" inputmode="decimal" value="10">
+                  <button type="button" data-target="increase" data-delta="1" aria-label="Increase projected percentage change" data-i18n-aria-label="increaseProjectedChange"><svg class="icon"><use href="#icon-plus"></use></svg></button>
                 </div>
               </div>
               <div class="range-row">
-                <input id="increaseRange" type="range" min="-500" max="2000" step="1" value="25" aria-label="Future price slider" data-i18n-aria-label="projectedChangeSlider">
-                <div class="range-limits"><span>-₦500</span><span>+₦2,000</span></div>
+                <input id="increaseRange" type="range" min="-100" max="500" step="1" value="10" aria-label="Projected percentage change slider" data-i18n-aria-label="projectedChangeSlider">
+                <div class="range-limits"><span>-100%</span><span>+500%</span></div>
               </div>
               <div class="quick-actions" aria-label="Preset price changes">
-                <button type="button" class="chip" data-preset="25">+₦25</button>
-                <button type="button" class="chip" data-preset="50">+₦50</button>
-                <button type="button" class="chip" data-preset="100">+₦100</button>
-                <button type="button" class="chip" data-preset="250">+₦250</button>
+                <button type="button" class="chip" data-preset="-20">-20%</button>
+                <button type="button" class="chip" data-preset="-10">-10%</button>
+                <button type="button" class="chip" data-preset="10">+10%</button>
+                <button type="button" class="chip" data-preset="25">+25%</button>
+                <button type="button" class="chip" data-preset="50">+50%</button>
               </div>
             </div>
           </article>
@@ -1699,7 +1924,33 @@
           <article class="control">
             <h2 class="panel-heading" data-i18n="whatIfTitle">What if?</h2>
             <div class="what-if-content" id="whatIfContent">
-              <div class="hint" data-i18n="whatIfHint">Enter the prices yourself; this page does not fetch live market data.</div>
+              <div class="hint" data-i18n="whatIfHint">Enter prices yourself, or fetch a few NGX examples with EODHD.</div>
+              <div class="api-helper" aria-label="EODHD stock lookup">
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="eodhdStock" data-i18n="eodhdStock">Pick NGX stock</label>
+                    <select id="eodhdStock" class="field-input">
+                      <option value="ACCESSCORP.XNSA">Access Holdings</option>
+                      <option value="GTCO.XNSA">GTCO</option>
+                      <option value="MTNN.XNSA">MTN Nigeria</option>
+                      <option value="ZENITHBANK.XNSA">Zenith Bank</option>
+                      <option value="DANGCEM.XNSA">Dangote Cement</option>
+                      <option value="NGXGROUP.XNSA">NGX Group</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="eodhdYear" data-i18n="eodhdYear">Year</label>
+                    <select id="eodhdYear" class="field-input"></select>
+                  </div>
+                </div>
+                <div class="api-actions">
+                  <button type="button" class="api-button" id="eodhdFetch" aria-label="Fetch EODHD prices" data-i18n-aria-label="eodhdFetch">
+                    <svg class="icon"><use href="#icon-chart"></use></svg>
+                    <span data-i18n="eodhdFetch">Fetch prices</span>
+                  </button>
+                  <div class="api-status" id="eodhdStatus" aria-live="polite"></div>
+                </div>
+              </div>
               <div class="field-grid">
                 <div class="field">
                   <label for="whatIfStock" data-i18n="stockName">Stock name</label>
@@ -1818,11 +2069,11 @@
         <strong class="footer-title" data-i18n="footerTitle">Investor education</strong>
         <p data-i18n="disclaimer">This calculator is for education only and is not financial advice.</p>
         <div class="copyright" data-i18n="copyright">Wot If? Copyright 2026 Made with ❤️ in Abuja</div>
-        <a class="creator-link" href="https://x.com/0x0bytez" target="_blank" rel="noopener">
+        <a class="creator-link" href="https://x.com/streetCTO" target="_blank" rel="noopener">
           <svg class="icon"><use href="#icon-x-logo"></use></svg>
-          <span data-i18n="creatorLink">Follow 0x0bytez</span>
+          <span data-i18n="creatorLink">Follow streetCTO</span>
         </a>
-        <a class="creator-link" href="https://x.com/intent/tweet?text=@0x0bytez%20I%20tried%20Wot%20If%3F%20and%20" target="_blank" rel="noopener">
+        <a class="creator-link" href="https://x.com/intent/tweet?text=@streetCTO%20I%20tried%20Wot%20If%3F%20and%20" target="_blank" rel="noopener">
           <svg class="icon"><use href="#icon-x-logo"></use></svg>
           <span data-i18n="replyOnX">Reply on X</span>
         </a>
@@ -1885,21 +2136,33 @@
       </div>
     </div>
 
+    <div class="education-modal" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 class="modal-title" id="aboutTitle" data-i18n="aboutTitle">About Wot If?</h2>
+        </div>
+        <div class="modal-body">
+          <div class="modal-lines" id="aboutLines"></div>
+          <button type="button" class="modal-cta" id="aboutUnderstand" data-i18n="aboutUnderstand">I understand</button>
+        </div>
+      </div>
+    </div>
+
     <div class="education-modal" id="welcomeModal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" hidden>
       <div class="modal-panel">
         <div class="modal-header">
-          <h2 class="modal-title" id="welcomeTitle" data-i18n="welcomeTitle">Choose your language</h2>
-          <button type="button" class="modal-close icon-button" id="welcomeClose" aria-label="Keep Pidgin" data-i18n-aria-label="keepPidgin"><svg class="icon"><use href="#icon-x"></use></svg></button>
+          <h2 class="modal-title" id="welcomeTitle" data-i18n="welcomeTitle">Before you start</h2>
         </div>
         <div class="modal-body">
-          <p class="welcome-copy"><strong>Wot If?</strong> <span data-i18n="welcomeCopyRest">starts in Pidgin, but you can choose the language that is easiest for you.</span></p>
+          <div class="modal-lines welcome-copy" id="welcomeLines"></div>
           <div class="language-choice-grid" aria-label="Choose language" data-i18n-aria-label="chooseLanguage">
-            <button type="button" class="language-choice" data-language-choice="pcm">Pidgin</button>
-            <button type="button" class="language-choice" data-language-choice="en">English</button>
-            <button type="button" class="language-choice" data-language-choice="yo">Yoruba</button>
-            <button type="button" class="language-choice" data-language-choice="ha">Hausa</button>
-            <button type="button" class="language-choice" data-language-choice="ig">Igbo</button>
+            <button type="button" class="language-choice" data-language-choice="pcm" aria-pressed="true">Pidgin</button>
+            <button type="button" class="language-choice" data-language-choice="en" aria-pressed="false">English</button>
+            <button type="button" class="language-choice" data-language-choice="yo" aria-pressed="false">Yoruba</button>
+            <button type="button" class="language-choice" data-language-choice="ha" aria-pressed="false">Hausa</button>
+            <button type="button" class="language-choice" data-language-choice="ig" aria-pressed="false">Igbo</button>
           </div>
+          <button type="button" class="modal-cta" id="welcomeUnderstand" data-i18n="welcomeUnderstand">I understand, continue</button>
         </div>
       </div>
     </div>
@@ -1915,11 +2178,20 @@
     const HISTORY_KEY = "share-growth-simulator:recent-naira-calculations";
     const COLLAPSE_KEY = "share-growth-simulator:collapsed-sections";
     const LANGUAGE_KEY = "share-growth-simulator:language";
-    const WELCOME_KEY = "share-growth-simulator:welcome-language-seen";
+    const WELCOME_KEY = "share-growth-simulator:welcome-lang-seen";
     const THEME_KEY = "share-growth-simulator:theme";
     const WHAT_IF_KEY = "share-growth-simulator:what-if";
+    const EODHD_CACHE_KEY = "share-growth-simulator:eodhd-cache";
     const ACTIVE_TAB_KEY = "share-growth-simulator:active-tab";
     const MAX_HISTORY_ITEMS = 6;
+    const EODHD_STOCKS = {
+      "ACCESSCORP.XNSA": "Access Holdings",
+      "GTCO.XNSA": "GTCO",
+      "MTNN.XNSA": "MTN Nigeria",
+      "ZENITHBANK.XNSA": "Zenith Bank",
+      "DANGCEM.XNSA": "Dangote Cement",
+      "NGXGROUP.XNSA": "NGX Group"
+    };
     let saveTimer;
     let currentLanguage = "pcm";
     let currentTheme = "light";
@@ -1929,13 +2201,29 @@
       en: {
         appTitle: "Wot If?",
         subtitle: "Simulate market positions.",
+        aboutOpen: "About Wot If?",
+        aboutTitle: "About Wot If?",
+        aboutLines: [
+          "Wot If?",
+          "This is a calculator for asking “what if I bought shares?”",
+          "It does not sell shares.",
+          "It does not tell you what to buy.",
+          "It only helps you test assumptions with numbers."
+        ],
+        aboutUnderstand: "I understand",
         language: "Language",
         moreSettings: "More settings",
         settingsTitle: "Settings",
         closeSettings: "Close settings",
-        welcomeTitle: "Choose your language",
-        welcomeCopyRest: "starts in Pidgin, but you can choose the language that is easiest for you.",
-        keepPidgin: "Keep Pidgin",
+        welcomeTitle: "Before you start",
+        welcomeLines: [
+          "Wot If?",
+          "This is a calculator for asking “what if I bought shares?”",
+          "It does not sell shares.",
+          "It does not tell you what to buy.",
+          "It only helps you test assumptions with numbers."
+        ],
+        welcomeUnderstand: "I understand, continue",
         chooseLanguage: "Choose language",
         calculatorMode: "Calculator mode",
         simulatorTab: "My shares",
@@ -1953,10 +2241,10 @@
         decreasePrice: "Decrease current share price",
         increasePrice: "Increase current share price",
         priceSlider: "Current price per share slider",
-        projectedPriceChange: "(₦) Future price",
-        decreaseProjectedChange: "Decrease projected change",
-        increaseProjectedChange: "Increase projected change",
-        projectedChangeSlider: "Future price slider",
+        projectedPriceChange: "(%) Expected price change",
+        decreaseProjectedChange: "Decrease projected percentage change",
+        increaseProjectedChange: "Increase projected percentage change",
+        projectedChangeSlider: "Projected percentage change slider",
         addRemoveMoney: "Add or remove money",
         amount: "(₦) Amount",
         amountHint: "Enter the naira amount and the price where the buy or sell happens.",
@@ -1982,7 +2270,7 @@
         footerTitle: "Investor education",
         disclaimer: "This calculator is for education only and is not financial advice.",
         copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
-        creatorLink: "Follow 0x0bytez",
+        creatorLink: "Follow streetCTO",
         replyOnX: "Reply on X",
         educationLinks: "Investor education links",
         ngxLink: "NGX",
@@ -1990,7 +2278,15 @@
         stockLink: "Stock basics",
         ipoLink: "IPO basics",
         whatIfTitle: "What if?",
-        whatIfHint: "Enter the prices yourself; this page does not fetch live market data.",
+        whatIfHint: "Enter prices yourself, or fetch a few NGX examples with EODHD.",
+        eodhdStock: "Pick NGX stock",
+        eodhdYear: "Year",
+        eodhdFetch: "Fetch prices",
+        eodhdLoading: "Fetching saved market data for this stock and year...",
+        eodhdCached: "Used saved prices. No new API request.",
+        eodhdReady: ({ stock, year }) => `Filled ${stock} prices from ${year}. You can still edit them.`,
+        eodhdEmpty: "No prices found for that stock and year. Try another year or enter prices manually.",
+        eodhdError: "Could not fetch prices now. Check the key, limit, or network, then try again.",
         stockName: "Stock name",
         stockPlaceholder: "e.g. MTN Nigeria",
         investmentDate: "Investment date",
@@ -2040,18 +2336,34 @@
         addedShares: ({ shares, amount, price }) => `Added ${shares} shares from ${amount} at ${price}/share.`,
         removedShares: ({ shares, amount, price }) => `Removed ${shares} shares worth ${amount} at ${price}/share.`,
         historyMain: ({ shares, price, futureValue }) => `${shares} shares at ${price} -> ${futureValue}`,
-        historyMeta: ({ change, futurePrice }) => `${change}/share change, ${futurePrice}/share`
+        historyMeta: ({ percentChange, change, futurePrice }) => `${percentChange} (${change}/share), ${futurePrice}/share`
       },
       pcm: {
         appTitle: "Wot If?",
         subtitle: "Check how your market position fit move.",
+        aboutOpen: "About Wot If?",
+        aboutTitle: "About Wot If?",
+        aboutLines: [
+          "Wot If?",
+          "Na calculator for asking “what if I buy shares?”",
+          "E no dey sell shares.",
+          "E no dey tell you wetin to buy.",
+          "E just help you test assumption with numbers."
+        ],
+        aboutUnderstand: "I understand",
         language: "Language",
         moreSettings: "More settings",
         settingsTitle: "Settings",
         closeSettings: "Close settings",
-        welcomeTitle: "Choose your language",
-        welcomeCopyRest: "dey start with Pidgin, but choose the language wey easy pass for you.",
-        keepPidgin: "Keep Pidgin",
+        welcomeTitle: "Before you start",
+        welcomeLines: [
+          "Wot If?",
+          "Na calculator for asking “what if I buy shares?”",
+          "E no dey sell shares.",
+          "E no dey tell you wetin to buy.",
+          "E just help you test assumption with numbers."
+        ],
+        welcomeUnderstand: "I understand, continue",
         chooseLanguage: "Choose language",
         calculatorMode: "Calculator mode",
         simulatorTab: "My shares",
@@ -2069,10 +2381,10 @@
         decreasePrice: "Reduce current share price",
         increasePrice: "Add current share price",
         priceSlider: "Current price slider",
-        projectedPriceChange: "(₦) Price change wey you expect",
-        decreaseProjectedChange: "Reduce expected price change",
-        increaseProjectedChange: "Add expected price change",
-        projectedChangeSlider: "Expected price change slider",
+        projectedPriceChange: "(%) Price change wey you expect",
+        decreaseProjectedChange: "Reduce expected percentage change",
+        increaseProjectedChange: "Add expected percentage change",
+        projectedChangeSlider: "Expected percentage change slider",
         addRemoveMoney: "Add or remove money",
         amount: "(₦) Amount",
         amountHint: "Put the naira amount and the price where you wan buy or sell.",
@@ -2098,7 +2410,7 @@
         footerTitle: "Investor education",
         disclaimer: "This calculator na for learning only; e no be financial advice.",
         copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
-        creatorLink: "Follow 0x0bytez",
+        creatorLink: "Follow streetCTO",
         replyOnX: "Reply on X",
         educationLinks: "Investor education links",
         ngxLink: "NGX",
@@ -2106,7 +2418,15 @@
         stockLink: "Wetin be Stock?",
         ipoLink: "Wetin be IPO?",
         whatIfTitle: "What if?",
-        whatIfHint: "Put the prices yourself; this page no dey fetch live market data.",
+        whatIfHint: "Put prices yourself, or fetch small NGX examples with EODHD.",
+        eodhdStock: "Pick NGX stock",
+        eodhdYear: "Year",
+        eodhdFetch: "Fetch prices",
+        eodhdLoading: "We dey fetch saved market data for this stock and year...",
+        eodhdCached: "We use saved prices. No new API request.",
+        eodhdReady: ({ stock, year }) => `We don fill ${stock} prices from ${year}. You fit still edit am.`,
+        eodhdEmpty: "We no see prices for that stock and year. Try another year or put prices yourself.",
+        eodhdError: "Price no gree load now. Check key, limit, or network, then try again.",
         stockName: "Stock name",
         stockPlaceholder: "e.g. MTN Nigeria",
         investmentDate: "Date wey you invest",
@@ -2156,7 +2476,7 @@
         addedShares: ({ shares, amount, price }) => `Added ${shares} shares from ${amount} at ${price}/share.`,
         removedShares: ({ shares, amount, price }) => `Removed ${shares} shares worth ${amount} at ${price}/share.`,
         historyMain: ({ shares, price, futureValue }) => `${shares} shares at ${price} -> ${futureValue}`,
-        historyMeta: ({ change, futurePrice }) => `${change}/share change, ${futurePrice}/share`
+        historyMeta: ({ percentChange, change, futurePrice }) => `${percentChange} (${change}/share), ${futurePrice}/share`
       },
       yo: {
         appTitle: "Wot If?",
@@ -2165,9 +2485,15 @@
         moreSettings: "Awon eto miran",
         settingsTitle: "Eto",
         closeSettings: "Pa eto",
-        welcomeTitle: "Yan ede re",
-        welcomeCopyRest: "maa n bere pelu Pidgin, sugbon yan ede ti o rorun ju fun e.",
-        keepPidgin: "Lo Pidgin",
+        welcomeTitle: "Ki o to bere",
+        welcomeLines: [
+          "Wot If?",
+          "Je kalikuleto fun ibeere “ti mo ba ra shares nko?”",
+          "Ko ta shares.",
+          "Ko so ohun ti o ye ki o ra.",
+          "O kan ran e lowo lati fi number dan assumption wo."
+        ],
+        welcomeUnderstand: "Mo ye, tesiwaju",
         chooseLanguage: "Yan ede",
         calculatorMode: "Ipo kalikuleto",
         simulatorTab: "Awon ipin mi",
@@ -2185,7 +2511,7 @@
         decreasePrice: "Din owo ipin bayi ku",
         increasePrice: "Fi owo ipin bayi kun",
         priceSlider: "Slider fun owo ipin bayi",
-        projectedPriceChange: "(₦) Iyipada owo ti a reti",
+        projectedPriceChange: "(%) Iyipada owo ti a reti",
         decreaseProjectedChange: "Din iyipada ti a reti ku",
         increaseProjectedChange: "Fi iyipada ti a reti kun",
         projectedChangeSlider: "Slider fun iyipada owo ti a reti",
@@ -2214,7 +2540,7 @@
         footerTitle: "Eko fun oludokoowo",
         disclaimer: "Kalikuleto yi wa fun eko nikan; kii se imoran owo.",
         copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
-        creatorLink: "Tele 0x0bytez",
+        creatorLink: "Tele streetCTO",
         replyOnX: "Fi reply ranse lori X",
         educationLinks: "Awon linki eko fun oludokoowo",
         ngxLink: "NGX",
@@ -2272,7 +2598,7 @@
         addedShares: ({ shares, amount, price }) => `A fi ${shares} ipin kun pelu ${amount} ni ${price}/ipin.`,
         removedShares: ({ shares, amount, price }) => `A yo ${shares} ipin kuro ti iye re je ${amount} ni ${price}/ipin.`,
         historyMain: ({ shares, price, futureValue }) => `${shares} ipin ni ${price} -> ${futureValue}`,
-        historyMeta: ({ change, futurePrice }) => `${change}/ipin iyipada, ${futurePrice}/ipin`
+        historyMeta: ({ percentChange, change, futurePrice }) => `${percentChange} (${change}/ipin), ${futurePrice}/ipin`
       },
       ha: {
         appTitle: "Wot If?",
@@ -2281,9 +2607,15 @@
         moreSettings: "Karin saituna",
         settingsTitle: "Saituna",
         closeSettings: "Rufe saituna",
-        welcomeTitle: "Zabi harshe",
-        welcomeCopyRest: "na farawa da Pidgin, amma zabi harshen da ya fi maka sauki.",
-        keepPidgin: "Ci gaba da Pidgin",
+        welcomeTitle: "Kafin ka fara",
+        welcomeLines: [
+          "Wot If?",
+          "Kalkuleta ce don tambayar “idan na sayi shares fa?”",
+          "Ba ta sayar da shares.",
+          "Ba ta gaya maka abin saya.",
+          "Tana taimaka maka gwada zato da lambobi kawai."
+        ],
+        welcomeUnderstand: "Na gane, ci gaba",
         chooseLanguage: "Zabi harshe",
         calculatorMode: "Yanayin kalkuleta",
         simulatorTab: "Hannuna",
@@ -2301,7 +2633,7 @@
         decreasePrice: "Rage farashin yanzu",
         increasePrice: "Kara farashin yanzu",
         priceSlider: "Slider na farashin yanzu",
-        projectedPriceChange: "(₦) Canjin farashi da ake tsammani",
+        projectedPriceChange: "(%) Canjin farashi da ake tsammani",
         decreaseProjectedChange: "Rage canjin da ake tsammani",
         increaseProjectedChange: "Kara canjin da ake tsammani",
         projectedChangeSlider: "Slider na canjin farashi",
@@ -2330,7 +2662,7 @@
         footerTitle: "Ilimin masu zuba jari",
         disclaimer: "Wannan kalkuleta na ilimi ne kawai; ba shawarar kudi ba ce.",
         copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
-        creatorLink: "Bi 0x0bytez",
+        creatorLink: "Bi streetCTO",
         replyOnX: "Amsa a X",
         educationLinks: "Hanyoyin ilimin masu zuba jari",
         ngxLink: "NGX",
@@ -2388,7 +2720,7 @@
         addedShares: ({ shares, amount, price }) => `An kara ${shares} hannun jari daga ${amount} a ${price}/hannu.`,
         removedShares: ({ shares, amount, price }) => `An cire ${shares} hannun jari na ${amount} a ${price}/hannu.`,
         historyMain: ({ shares, price, futureValue }) => `${shares} hannun jari a ${price} -> ${futureValue}`,
-        historyMeta: ({ change, futurePrice }) => `${change}/hannu canji, ${futurePrice}/hannu`
+        historyMeta: ({ percentChange, change, futurePrice }) => `${percentChange} (${change}/hannu), ${futurePrice}/hannu`
       },
       ig: {
         appTitle: "Wot If?",
@@ -2397,9 +2729,15 @@
         moreSettings: "Ntọala ndị ọzọ",
         settingsTitle: "Ntọala",
         closeSettings: "Mechie ntọala",
-        welcomeTitle: "Họrọ asụsụ gị",
-        welcomeCopyRest: "na-amalite na Pidgin, mana họrọ asụsụ kacha dịrị gị mfe.",
-        keepPidgin: "Jiri Pidgin gaa n'ihu",
+        welcomeTitle: "Tupu ibido",
+        welcomeLines: [
+          "Wot If?",
+          "Bụ kalkuletọ maka ịjụ “gịnị ma ọ bụrụ na m zụtara shares?”",
+          "Ọ naghị ere shares.",
+          "Ọ naghị agwa gị ihe ị ga-azụ.",
+          "Ọ na-enyere gị aka iji nọmba nwalee echiche."
+        ],
+        welcomeUnderstand: "Aghọtara m, gaa n'ihu",
         chooseLanguage: "Họrọ asụsụ",
         calculatorMode: "Ụdị kalkuletọ",
         simulatorTab: "Akụkụ m",
@@ -2417,7 +2755,7 @@
         decreasePrice: "Belata ọnụahịa ugbu a",
         increasePrice: "Tinye ọnụahịa ugbu a",
         priceSlider: "Slider ọnụahịa ugbu a",
-        projectedPriceChange: "(₦) Mgbanwe ọnụahịa a tụrụ anya",
+        projectedPriceChange: "(%) Mgbanwe ọnụahịa a tụrụ anya",
         decreaseProjectedChange: "Belata mgbanwe a tụrụ anya",
         increaseProjectedChange: "Tinye mgbanwe a tụrụ anya",
         projectedChangeSlider: "Slider mgbanwe ọnụahịa",
@@ -2446,7 +2784,7 @@
         footerTitle: "Mmụta maka itinye ego",
         disclaimer: "Kalkuletọ a bu maka mmụta naanị; ọ bụghị ndụmọdụ ego.",
         copyright: "Wot If? Copyright 2026 Made with ❤️ in Abuja",
-        creatorLink: "Soro 0x0bytez",
+        creatorLink: "Soro streetCTO",
         replyOnX: "Zaghachi na X",
         educationLinks: "Njikọ mmụta maka itinye ego",
         ngxLink: "NGX",
@@ -2504,7 +2842,7 @@
         addedShares: ({ shares, amount, price }) => `A tinyere ${shares} akụkụ site na ${amount} na ${price}/akụkụ.`,
         removedShares: ({ shares, amount, price }) => `A wepụrụ ${shares} akụkụ ruru ${amount} na ${price}/akụkụ.`,
         historyMain: ({ shares, price, futureValue }) => `${shares} akụkụ na ${price} -> ${futureValue}`,
-        historyMeta: ({ change, futurePrice }) => `${change}/akụkụ mgbanwe, ${futurePrice}/akụkụ`
+        historyMeta: ({ percentChange, change, futurePrice }) => `${percentChange} (${change}/akụkụ), ${futurePrice}/akụkụ`
       }
     };
 
@@ -2524,8 +2862,9 @@
       increase: {
         input: document.getElementById("increase"),
         range: document.getElementById("increaseRange"),
-        min: -500,
-        max: 2000
+        min: -100,
+        max: Number.POSITIVE_INFINITY,
+        rangeMax: 500
       }
     };
 
@@ -2579,12 +2918,17 @@
       historyList: document.getElementById("historyList"),
       clearHistory: document.getElementById("clearHistory"),
       language: document.getElementById("language"),
+      aboutOpen: document.getElementById("aboutOpen"),
+      aboutModal: document.getElementById("aboutModal"),
+      aboutUnderstand: document.getElementById("aboutUnderstand"),
+      aboutLines: document.getElementById("aboutLines"),
       themeToggle: document.getElementById("themeToggle"),
       settingsOpen: document.getElementById("settingsOpen"),
       settingsModal: document.getElementById("settingsModal"),
       settingsClose: document.getElementById("settingsClose"),
       welcomeModal: document.getElementById("welcomeModal"),
-      welcomeClose: document.getElementById("welcomeClose"),
+      welcomeUnderstand: document.getElementById("welcomeUnderstand"),
+      welcomeLines: document.getElementById("welcomeLines"),
       themeIcon: document.getElementById("themeIcon"),
       themeLabel: document.querySelector("[data-theme-label]"),
       educationModal: document.getElementById("educationModal"),
@@ -2592,6 +2936,10 @@
       educationBody: document.getElementById("educationBody"),
       educationReadMore: document.getElementById("educationReadMore"),
       educationClose: document.getElementById("educationClose"),
+      eodhdStock: document.getElementById("eodhdStock"),
+      eodhdYear: document.getElementById("eodhdYear"),
+      eodhdFetch: document.getElementById("eodhdFetch"),
+      eodhdStatus: document.getElementById("eodhdStatus"),
       whatIfStock: document.getElementById("whatIfStock"),
       whatIfDate: document.getElementById("whatIfDate"),
       whatIfShares: document.getElementById("whatIfShares"),
@@ -2649,6 +2997,25 @@
       });
     }
 
+    function renderModalLines(container, lines) {
+      container.textContent = "";
+      const safeLines = Array.isArray(lines) ? lines : [];
+
+      safeLines.forEach((line, index) => {
+        const paragraph = document.createElement("p");
+
+        if (index === 0) {
+          const strong = document.createElement("strong");
+          strong.textContent = line;
+          paragraph.append(strong);
+        } else {
+          paragraph.textContent = line;
+        }
+
+        container.append(paragraph);
+      });
+    }
+
     function applyLanguage(language) {
       currentLanguage = dictionaries[language] ? language : "pcm";
       document.documentElement.lang = currentLanguage;
@@ -2671,6 +3038,9 @@
       document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
         element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
       });
+
+      renderModalLines(output.aboutLines, dictionaries[currentLanguage].aboutLines || dictionaries.en.aboutLines);
+      renderModalLines(output.welcomeLines, dictionaries[currentLanguage].welcomeLines || dictionaries.en.welcomeLines);
 
       if (activeEducationTopic) {
         showEducation(activeEducationTopic);
@@ -2706,6 +3076,16 @@
       output.educationModal.hidden = true;
     }
 
+    function openAbout() {
+      output.aboutModal.hidden = false;
+      output.aboutUnderstand.focus();
+    }
+
+    function closeAbout() {
+      output.aboutModal.hidden = true;
+      output.aboutOpen.focus();
+    }
+
     function openSettings() {
       output.settingsModal.hidden = false;
       output.language.focus();
@@ -2730,7 +3110,9 @@
 
     function chooseWelcomeLanguage(language) {
       applyLanguage(language);
-      closeWelcome();
+      document.querySelectorAll("[data-language-choice]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.languageChoice === currentLanguage));
+      });
     }
 
     function maybeShowWelcome() {
@@ -2743,7 +3125,7 @@
       }
 
       output.welcomeModal.hidden = false;
-      output.welcomeModal.querySelector("[data-language-choice='pcm']").focus();
+      output.welcomeUnderstand.focus();
     }
 
     function updateThemeButton() {
@@ -2796,7 +3178,7 @@
       const control = controls[name];
       const nextValue = clamp(readNumber(value), control.min, control.max);
       control.input.value = formatInputNumber(nextValue, inputDecimals[name]);
-      control.range.value = nextValue;
+      control.range.value = clamp(nextValue, control.min, control.rangeMax ?? control.max);
       calculate({ save: shouldSave });
     }
 
@@ -2817,6 +3199,98 @@
 
       if (shouldSave) {
         writeWhatIfState();
+      }
+    }
+
+    function getTodayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function setupEodhdYears() {
+      const currentYear = new Date().getFullYear();
+      output.eodhdYear.textContent = "";
+
+      for (let year = currentYear; year >= 2010; year -= 1) {
+        const option = document.createElement("option");
+        option.value = String(year);
+        option.textContent = String(year);
+        output.eodhdYear.append(option);
+      }
+    }
+
+    function readEodhdCache() {
+      try {
+        return JSON.parse(localStorage.getItem(EODHD_CACHE_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function writeEodhdCache(cache) {
+      try {
+        localStorage.setItem(EODHD_CACHE_KEY, JSON.stringify(cache));
+      } catch {
+      }
+    }
+
+    function getEodhdCacheKey(symbol, year) {
+      return `${symbol}:${year}:${getTodayISO()}`;
+    }
+
+    function applyEodhdPrices({ symbol, year, buyPrice, todayPrice, cached }) {
+      const stockName = EODHD_STOCKS[symbol] || symbol;
+
+      output.whatIfStock.value = stockName;
+      output.whatIfDate.value = `${year}-01-01`;
+      setWhatIfControl("whatIfBuyPrice", buyPrice, { save: false });
+      setWhatIfControl("whatIfTodayPrice", todayPrice, { save: false });
+      writeWhatIfState();
+      output.eodhdStatus.textContent = cached ? t("eodhdCached") : t("eodhdReady")({ stock: stockName, year });
+    }
+
+    async function fetchEodhdPrices() {
+      const symbol = output.eodhdStock.value;
+      const year = output.eodhdYear.value;
+      const cacheKey = getEodhdCacheKey(symbol, year);
+      const cache = readEodhdCache();
+
+      if (cache[cacheKey]) {
+        applyEodhdPrices({ symbol, year, ...cache[cacheKey], cached: true });
+        return;
+      }
+
+      output.eodhdFetch.disabled = true;
+      output.eodhdStatus.textContent = t("eodhdLoading");
+
+      try {
+        const params = new URLSearchParams({
+          symbol,
+          year
+        });
+        const response = await fetch(`/api/eodhd?${params.toString()}`);
+
+        if (!response.ok) {
+          throw new Error(`Worker responded with ${response.status}`);
+        }
+
+        const data = await response.json();
+        const prices = {
+          buyPrice: readNumber(data.buyPrice),
+          todayPrice: readNumber(data.todayPrice)
+        };
+
+        if (prices.buyPrice <= 0 || prices.todayPrice <= 0) {
+          output.eodhdStatus.textContent = t("eodhdEmpty");
+          return;
+        }
+
+        cache[cacheKey] = prices;
+        writeEodhdCache(cache);
+        applyEodhdPrices({ symbol, year, ...prices, cached: false });
+      } catch (error) {
+        output.eodhdStatus.textContent = t("eodhdError");
+      } finally {
+        output.eodhdFetch.disabled = false;
       }
     }
 
@@ -2853,6 +3327,8 @@
         localStorage.setItem(WHAT_IF_KEY, JSON.stringify({
           stock: output.whatIfStock.value,
           date: output.whatIfDate.value,
+          eodhdStock: output.eodhdStock.value,
+          eodhdYear: output.eodhdYear.value,
           amount: readNumber(whatIfControls.whatIfAmount.input.value),
           buyPrice: readNumber(whatIfControls.whatIfBuyPrice.input.value),
           todayPrice: readNumber(whatIfControls.whatIfTodayPrice.input.value)
@@ -2866,6 +3342,8 @@
 
       output.whatIfStock.value = typeof savedState.stock === "string" ? savedState.stock : "";
       output.whatIfDate.value = typeof savedState.date === "string" ? savedState.date : "";
+      output.eodhdStock.value = typeof savedState.eodhdStock === "string" ? savedState.eodhdStock : output.eodhdStock.value;
+      output.eodhdYear.value = typeof savedState.eodhdYear === "string" ? savedState.eodhdYear : output.eodhdYear.value;
 
       if (savedState.amount !== undefined) {
         setWhatIfControl("whatIfAmount", savedState.amount, { save: false });
@@ -2919,15 +3397,17 @@
     function getCalculation() {
       const shares = readNumber(controls.shares.input.value);
       const price = readNumber(controls.price.input.value);
-      const change = readNumber(controls.increase.input.value);
+      const percentChange = readNumber(controls.increase.input.value);
+      const change = price * percentChange / 100;
       const currentValue = shares * price;
-      const futurePrice = Math.max(0, price + change);
+      const futurePrice = price + change;
       const futureValue = shares * futurePrice;
       const gainLoss = futureValue - currentValue;
 
       return {
         shares,
         price,
+        percentChange,
         change,
         currentValue,
         futurePrice,
@@ -2939,15 +3419,15 @@
     function calculate(options = {}) {
       const shouldSave = options.save === true;
       const calculation = getCalculation();
-      const growthMeter = clamp((calculation.change + 500) / 2500 * 100, 0, 100);
+      const growthMeter = clamp((calculation.percentChange + 100) / 600 * 100, 0, 100);
 
       output.currentValue.textContent = formatter.format(calculation.currentValue);
       output.futureValue.textContent = formatter.format(calculation.futureValue);
       output.futurePrice.textContent = `${formatter.format(calculation.futurePrice)}/${t("shareUnit")}`;
       output.gainLoss.textContent = signedCurrency(calculation.gainLoss);
-      output.changeLabel.textContent = `${signedCurrency(calculation.change)}/${t("shareUnit")}`;
+      output.changeLabel.textContent = `${signedCurrency(calculation.change)}/${t("shareUnit")} (${calculation.percentChange > 0 ? "+" : ""}${formatInputNumber(calculation.percentChange, 2)}%)`;
       output.barFill.style.width = `${growthMeter}%`;
-      applySignal(output.summaryTop, calculation.gainLoss);
+      applySignal(output.summaryTop, calculation.change);
       applySignal(output.futurePrice, calculation.change);
       applySignal(output.gainLoss, calculation.gainLoss);
       applySignal(output.changeLabel, calculation.change);
@@ -3043,7 +3523,7 @@
         ...existing.filter((entry) => (
           entry.shares !== calculation.shares ||
           entry.price !== calculation.price ||
-          entry.change !== calculation.change
+          entry.percentChange !== calculation.percentChange
         ))
       ].slice(0, MAX_HISTORY_ITEMS);
 
@@ -3079,6 +3559,9 @@
         const safeItem = {
           shares: readNumber(item.shares),
           price: readNumber(item.price),
+          percentChange: item.percentChange === undefined
+            ? (readNumber(item.price) > 0 ? readNumber(item.change) / readNumber(item.price) * 100 : 0)
+            : readNumber(item.percentChange),
           change: readNumber(item.change),
           futureValue: readNumber(item.futureValue),
           futurePrice: readNumber(item.futurePrice),
@@ -3102,6 +3585,7 @@
           futureValue: formatter.format(safeItem.futureValue)
         });
         meta.textContent = t("historyMeta")({
+          percentChange: `${safeItem.percentChange > 0 ? "+" : ""}${formatInputNumber(safeItem.percentChange, 2)}%`,
           change: signedCurrency(safeItem.change),
           futurePrice: formatter.format(safeItem.futurePrice)
         });
@@ -3121,7 +3605,10 @@
 
       setControl("shares", item.shares, { save: false });
       setControl("price", item.price, { save: false });
-      setControl("increase", item.change, { save: false });
+      const percentChange = item.percentChange === undefined
+        ? (readNumber(item.price) > 0 ? readNumber(item.change) / readNumber(item.price) * 100 : 0)
+        : readNumber(item.percentChange);
+      setControl("increase", percentChange, { save: false });
       saveHistoryItem(getCalculation());
     }
 
@@ -3188,9 +3675,14 @@
 
     document.getElementById("addMoney").addEventListener("click", () => applyMoneyAdjustment("buy"));
     document.getElementById("removeMoney").addEventListener("click", () => applyMoneyAdjustment("sell"));
+    output.eodhdFetch.addEventListener("click", fetchEodhdPrices);
+    output.eodhdStock.addEventListener("change", writeWhatIfState);
+    output.eodhdYear.addEventListener("change", writeWhatIfState);
     output.whatIfStock.addEventListener("input", writeWhatIfState);
     output.whatIfDate.addEventListener("input", writeWhatIfState);
     output.language.addEventListener("change", (event) => applyLanguage(event.target.value));
+    output.aboutOpen.addEventListener("click", openAbout);
+    output.aboutUnderstand.addEventListener("click", closeAbout);
     output.themeToggle.addEventListener("click", () => applyTheme(currentTheme === "dark" ? "light" : "dark"));
     output.settingsOpen.addEventListener("click", openSettings);
     output.settingsClose.addEventListener("click", closeSettings);
@@ -3199,12 +3691,7 @@
         closeSettings();
       }
     });
-    output.welcomeClose.addEventListener("click", closeWelcome);
-    output.welcomeModal.addEventListener("click", (event) => {
-      if (event.target === output.welcomeModal) {
-        closeWelcome();
-      }
-    });
+    output.welcomeUnderstand.addEventListener("click", closeWelcome);
     output.educationClose.addEventListener("click", closeEducation);
     output.educationModal.addEventListener("click", (event) => {
       if (event.target === output.educationModal) {
@@ -3213,7 +3700,6 @@
     });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && !output.welcomeModal.hidden) {
-        closeWelcome();
         return;
       }
 
@@ -3253,6 +3739,7 @@
 
     initDecorativeIcons();
     initCollapsibles();
+    setupEodhdYears();
     loadWhatIfState();
 
     try {

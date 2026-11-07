@@ -5,9 +5,10 @@
 ## Features
 
 - Share value simulator with sliders, typed inputs, and plus/minus controls
-- Naira-based price movement calculations
+- Percentage-based price movement scenarios with derived naira/share changes
 - Add or remove money at a chosen transaction price
 - "What if I invested?" tab for comparing an old buy price with today's price
+- Optional EODHD lookup for a small set of NGX stocks through a Cloudflare Worker proxy
 - Recent calculations saved in local storage
 - First-time language picker with Pidgin as the default
 - English, Pidgin, Yoruba, Hausa, and Igbo locale support
